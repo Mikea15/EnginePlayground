@@ -3,7 +3,11 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
-project ("EnginePlayground")
+project (EnginePlayground)
 
 # Include sub-projects.
-add_subdirectory ("EnginePlayground")
+include_directories(EnginePlayground)
+
+add_subdirectory(EnginePlayground)
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT EnginePlayground)

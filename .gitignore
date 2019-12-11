@@ -64,3 +64,6 @@ out/
 build/
 Data/Images
 Data/Objects
+Data/meshes
+Data/textures
+

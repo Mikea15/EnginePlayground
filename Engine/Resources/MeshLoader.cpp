@@ -8,6 +8,8 @@
 #include "Scene/SceneNode.h"
 #include "Shading/Texture.h"
 
+#include "Utils/Logger.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -25,20 +27,20 @@ void MeshLoader::Clean()
 
 SceneNode* MeshLoader::LoadMesh(Renderer* renderer, std::string path, bool setDefaultMaterial)
 {
-	// LOG("Loading mesh file at: " + path + ".");
+	LOG("Loading mesh file at: %s", path.c_str());
 
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
-		// LOG("Assimp failed to load model at path: " + path, LOG_ERROR);   
+		LOG_ERROR("Assimp failed to load model at path: %s", path.c_str());
 		return nullptr;
 	}
 
 	std::string directory = path.substr(0, path.find_last_of("/"));
 
-	// LOG("Succesfully loaded: " + path + ".");
+	LOG("Succesfully loaded: %s", path.c_str());
 
 	return MeshLoader::processNode(renderer, scene->mRootNode, scene, directory, setDefaultMaterial);
 }

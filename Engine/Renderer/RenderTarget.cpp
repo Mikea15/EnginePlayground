@@ -1,6 +1,6 @@
 #include "RenderTarget.h"
 
-
+#include "Utils/Logger.h"
 
 RenderTarget::RenderTarget(unsigned int width, unsigned int height, GLenum type, unsigned int nrColorAttachments, bool depthAndStencil)
 {
@@ -47,7 +47,7 @@ RenderTarget::RenderTarget(unsigned int width, unsigned int height, GLenum type,
 	}
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 	{
-		// LOG("Framebuffer not complete!", LOG_ERROR);
+		LOG_ERROR("Framebuffer not complete!");
 	}
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -63,7 +63,7 @@ Texture* RenderTarget::GetColorTexture(unsigned int index)
 		return &m_ColorAttachments[index];
 	else
 	{
-		// LOG("RenderTarget color texture requested, but not available: " + std::to_string(index));
+		LOG("RenderTarget color texture requested, but not available: %s", std::to_string(index).c_str());
 		return nullptr;
 	}
 }

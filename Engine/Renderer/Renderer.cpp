@@ -15,6 +15,8 @@
 #include "Camera/FlyCamera.h"
 #include "Resources/Resources.h"
 
+#include "Utils/Logger.h"
+
 #include <imgui.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -716,7 +718,7 @@ void Renderer::renderCustomCommand(RenderCommand* command, Camera* customCamera,
 			material->GetShader()->SetMatrix(it->first, it->second.Mat4);
 			break;
 		default:
-			// LOG("Unrecognized Uniform type set.", LOG_ERROR);
+			LOG_ERROR("Unrecognized Uniform type set.");
 			break;
 		}
 	}

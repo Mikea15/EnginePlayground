@@ -31,7 +31,7 @@ void Game::InitSystems()
 	m_sdlHandler.Init();
 
 	Resources::Init();
-	m_renderer = new Renderer();
+	m_renderer = new SimpleRenderer();
 	m_renderer->Init();
 	m_renderer->SetRenderSize(m_sdlHandler.GetWindowParams().Width, m_sdlHandler.GetWindowParams().Height);
 
@@ -133,9 +133,9 @@ int Game::Execute()
 		m_gameState->Render(alpha);
 
 		// ui
-		m_sdlHandler.BeginUIRender();
-		m_gameState->RenderUI();
-		m_sdlHandler.EndUIRender();
+		// m_sdlHandler.BeginUIRender();
+		// m_gameState->RenderUI();
+		// m_sdlHandler.EndUIRender();
 
 		m_sdlHandler.EndRender();
 	}

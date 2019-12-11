@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include "Window/SDLHandler.h"
-#include "Renderer/Renderer.h"
+#include "Renderer/SimpleRenderer.h"
 #include "Camera/FlyCamera.h"
 
 class State;
@@ -20,7 +20,7 @@ public:
 	int Execute();
 
 	SDLHandler* GetSDLHandler() { return &m_sdlHandler; }
-	Renderer* GetRenderer() { return m_renderer; }
+	SimpleRenderer* GetRenderer() { return m_renderer; }
 
 	double GetTimeMS() const { return m_time; }
 
@@ -38,7 +38,8 @@ private:
 	float m_deltaTime = 0.0f;
 	double m_time = 0.0f;
 
-	Renderer* m_renderer{};
+	SimpleRenderer* m_renderer{};
+	// Renderer* m_renderer{};
 	State* m_gameState{};
 	SDLHandler m_sdlHandler;
 };

@@ -6,7 +6,7 @@
 #include "Resources/Resources.h"
 
 #include "Utils/Utils.h"
-
+#include "Utils/Logger.h"
 
 
 MaterialLibrary::MaterialLibrary(RenderTarget* gBuffer)
@@ -42,7 +42,7 @@ Material* MaterialLibrary::CreateMaterial(std::string base)
 	}
 	else
 	{
-		// LOG("Material of template: " + base + " requested, but template did not exist.");
+		LOG_ERROR("Material of template: %s requested, but template did not exist.", base.c_str());
 		return nullptr;
 	}
 }

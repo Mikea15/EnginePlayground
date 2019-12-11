@@ -1,8 +1,11 @@
 
 #pragma once
 
-#define NOMINMAX
-#include <windows.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+//#define NOMINMAX
+// #include <windows.h>
 
 enum class LEVEL : int
 {
@@ -61,6 +64,7 @@ public:
 		strcat_s(finalBuffer, szBuff);
 		strcat_s(finalBuffer, "\n");
 
-		OutputDebugString(finalBuffer);
+		printf(finalBuffer);
+		// OutputDebugString(finalBuffer);
 	}
 };

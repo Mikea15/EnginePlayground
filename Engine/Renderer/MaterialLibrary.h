@@ -34,10 +34,10 @@ private:
 	Shader* deferredPointShader;
 
 	Shader* dirShadowShader;
-
+public:
 	Material* debugLightMaterial;
 public:
-	MaterialLibrary(RenderTarget* gBuffer);
+	MaterialLibrary(RenderTarget* gBuffer = nullptr);
 	~MaterialLibrary();
 
 	// create either a deferred default material (based on default set of materials available (like glass)), or a custom material (with custom you have to supply your own shader)

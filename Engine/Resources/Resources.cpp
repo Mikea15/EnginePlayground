@@ -12,6 +12,7 @@
 #include <stack>
 #include <vector>
 
+#include "Utils/Logger.h"
 
 std::map<unsigned int, Shader>      Resources::m_Shaders = std::map<unsigned int, Shader>();
 std::map<unsigned int, Texture>     Resources::m_Textures = std::map<unsigned int, Texture>();
@@ -59,7 +60,7 @@ Shader* Resources::GetShader(std::string name)
 	}
 	else
 	{
-		// LOG("Requested shader: " + name + " not found!");
+		LOG_ERROR("Requested shader: %s not found!", name.c_str());
 		return nullptr;
 	}
 }
@@ -72,11 +73,11 @@ Texture* Resources::LoadTexture(std::string name, std::string path, GLenum targe
 	if (Resources::m_Textures.find(id) != Resources::m_Textures.end())
 		return &Resources::m_Textures[id];
 
-	// LOG("Loading texture file at: " + path + ".");
+	LOG("Loading texture file at: %s", path.c_str());
 
 	Texture texture = TextureLoader::LoadTexture("../../../../data/" + path, target, format, srgb);
 
-	// LOG("Succesfully loaded: " + path + ".");
+	LOG("Succesfully loaded: %s", path.c_str());
 
 	// make sure texture got properly loaded
 	if (texture.Width > 0)
@@ -122,7 +123,7 @@ Texture* Resources::GetTexture(std::string name)
 	}
 	else
 	{
-		// LOG("Requested texture: " + name + " not found!");
+		LOG("Requested texture: %s not found", name.c_str());
 		return nullptr;
 	}
 }
@@ -151,7 +152,7 @@ TextureCube* Resources::GetTextureCube(std::string name)
 	}
 	else
 	{
-		// LOG("Requested texture cube: " + name + " not found!");
+		LOG("Requested texture cube: %s not found!", name.c_str());
 		return nullptr;
 	}
 }
@@ -193,7 +194,7 @@ SceneNode* Resources::GetMesh(std::string name)
 	}
 	else
 	{
-		// LOG("Requested mesh: " + name + " not found!");
+		LOG("Requested mesh: %s not found!", name.c_str());
 		return nullptr;
 	}
 }

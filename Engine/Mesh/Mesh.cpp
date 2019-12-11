@@ -3,7 +3,7 @@
 
 #include <GL/glew.h>
 
-
+#include "Utils/Logger.h"
 
 Mesh::Mesh()
 {
@@ -224,7 +224,7 @@ void Mesh::Finalize(bool interleaved)
 
 void Mesh::FromSDF(std::function<float(glm::vec3)>& sdf, float maxDistance, uint16_t gridResolution)
 {
-	// LOG("Generating 3D mesh from SDF");
+	LOG("Generating 3D mesh from SDF");
 
 	// tables from: http://paulbourke.net/geometry/polygonise/
 	static int edgeTable[256] =
@@ -675,7 +675,7 @@ void Mesh::FromSDF(std::function<float(glm::vec3)>& sdf, float maxDistance, uint
 	Topology = TRIANGLES;
 	Finalize();
 
-	// LOG("SDF mesh generation complete!");
+	LOG("SDF mesh generation complete!");
 }
 
 void Mesh::calculateNormals(bool smooth)

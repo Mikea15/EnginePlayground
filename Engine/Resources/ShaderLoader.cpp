@@ -1,6 +1,6 @@
 #include "ShaderLoader.h"
 
-
+#include "Utils/Logger.h"
 
 Shader ShaderLoader::Load(std::string name, std::string vsPath, std::string fsPath, std::vector<std::string> defines)
 {
@@ -11,7 +11,7 @@ Shader ShaderLoader::Load(std::string name, std::string vsPath, std::string fsPa
 	// if either of the two files don't exist, return w/ error message
 	if (!vsFile.is_open() || !fsFile.is_open())
 	{
-		// LOG("Shader failed to load at path: " + vsPath + " and " + fsPath, LOG_ERROR);
+		LOG_ERROR("Shader failed to load at path: %s and %s", vsPath, fsPath);
 		return Shader();
 	}
 
@@ -48,7 +48,7 @@ std::string ShaderLoader::readShader(std::ifstream& file, const std::string& nam
 			}
 			else
 			{
-				// LOG("Shader: " + name + ": include: " + includePath + " failed to open.", LOG_ERROR);
+				LOG_ERROR("Shader: %s include: %s failed to open.", name, includePath);
 			}
 			includeFile.close();
 		}

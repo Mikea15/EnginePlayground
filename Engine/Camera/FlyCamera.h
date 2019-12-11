@@ -10,20 +10,21 @@
   type of movement, combined with strafing and free yaw/pitch camera rotation.
 
 */
-class FlyCamera : public Camera
+class FlyCamera 
+	: public Camera
 {
 public:
-	float Yaw;
-	float Pitch;
+	float Yaw{};
+	float Pitch{};
 
 	float MovementSpeed = 10.0f;
 	float MouseSensitivty = 0.1f;
 	float Damping = 5.0f;
 private:
-	glm::vec3 m_TargetPosition;
-	glm::vec3 m_WorldUp;
-	float m_TargetYaw;
-	float m_TargetPitch;
+	glm::vec3 m_TargetPosition{};
+	glm::vec3 m_WorldUp{};
+	float m_TargetYaw{};
+	float m_TargetPitch{};
 
 public:
 	FlyCamera(glm::vec3 position, glm::vec3 forward = glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));

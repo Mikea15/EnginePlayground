@@ -6,7 +6,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-
+#include "Utils/Logger.h"
 
 Texture TextureLoader::LoadTexture(std::string path, GLenum target, GLenum internalFormat, bool srgb)
 {
@@ -41,7 +41,7 @@ Texture TextureLoader::LoadTexture(std::string path, GLenum target, GLenum inter
 	}
 	else
 	{
-		// LOG("Texture failed to load at path: " + path);
+		LOG("Texture failed to load at path: %s", path.c_str());
 		stbi_image_free(data);
 		return texture;
 	}
@@ -86,7 +86,7 @@ Texture TextureLoader::LoadHDRTexture(std::string path)
 	}
 	else
 	{
-		// LOG("Trying to load a HDR texture with invalid path or texture is not HDR: " + path + ".");
+		LOG("Trying to load a HDR texture with invalid path or texture is not HDR: %s", path.c_str());
 	}
 
 	return texture;
@@ -118,7 +118,7 @@ TextureCube TextureLoader::LoadTextureCube(std::string top, std::string bottom, 
 		}
 		else
 		{
-			// LOG("Cube texture at path: " + faces[i] + " failed to load.");
+			LOG("Cube texture at path: %s failed to load.", faces[i].c_str());
 			stbi_image_free(data);
 			return texture;
 		}

@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 
-
+#include "Utils/Logger.h"
 
 Shader::Shader()
 {
@@ -89,13 +89,13 @@ void Shader::Load(std::string name, std::string vsCode, std::string fsCode, std:
 	if (!status)
 	{
 		glGetShaderInfoLog(vs, 1024, NULL, log);
-		// LOG("Vertex shader compilation error at: " + name + "!\n" + std::string(log), LOG_ERROR);
+		LOG_ERROR("Vertex shader compilation error at: %s !\n %s", name.c_str(), std::string(log).c_str());
 	}
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &status);
 	if (!status)
 	{
 		glGetShaderInfoLog(fs, 1024, NULL, log);
-		// LOG("Fragment shader compilation error at: " + name + "!\n" + std::string(log), LOG_ERROR);
+		LOG_ERROR("Fragment shader compilation error at: %s !\n%s", name.c_str(), std::string(log).c_str());
 	}
 
 	glAttachShader(ID, vs);
@@ -106,7 +106,7 @@ void Shader::Load(std::string name, std::string vsCode, std::string fsCode, std:
 	if (!status)
 	{
 		glGetProgramInfoLog(ID, 1024, NULL, log);
-		// LOG("Shader program linking error: \n" + std::string(log), LOG_ERROR);
+		LOG_ERROR("Shader program linking error: \n %s", + std::string(log).c_str());
 	}
 
 	glDeleteShader(vs);

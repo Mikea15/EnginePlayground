@@ -40,7 +40,7 @@ Index of this file:
 // [SECTION] Style Editor / ShowStyleEditor()
 // [SECTION] Example App: Main Menu Bar / ShowExampleAppMainMenuBar()
 // [SECTION] Example App: Debug Console / ShowExampleAppConsole()
-// [SECTION] Example App: Debug Log / ShowExampleApp// LOG()
+// [SECTION] Example App: Debug Log / ShowExampleAppLog()
 // [SECTION] Example App: Simple Layout / ShowExampleAppLayout()
 // [SECTION] Example App: Property Editor / ShowExampleAppPropertyEditor()
 // [SECTION] Example App: Long Text / ShowExampleAppLongText()
@@ -125,7 +125,7 @@ Index of this file:
 static void ShowExampleAppDocuments(bool* p_open);
 static void ShowExampleAppMainMenuBar();
 static void ShowExampleAppConsole(bool* p_open);
-static void ShowExampleApp// LOG(bool* p_open);
+static void ShowExampleAppLog(bool* p_open);
 static void ShowExampleAppLayout(bool* p_open);
 static void ShowExampleAppPropertyEditor(bool* p_open);
 static void ShowExampleAppLongText(bool* p_open);
@@ -221,7 +221,7 @@ void ImGui::ShowDemoWindow(bool* p_open)
     if (show_app_documents)           ShowExampleAppDocuments(&show_app_documents);
     if (show_app_main_menu_bar)       ShowExampleAppMainMenuBar();
     if (show_app_console)             ShowExampleAppConsole(&show_app_console);
-    if (show_app_log)                 ShowExampleApp// LOG(&show_app_log);
+    if (show_app_log)                 ShowExampleAppLog(&show_app_log);
     if (show_app_layout)              ShowExampleAppLayout(&show_app_layout);
     if (show_app_property_editor)     ShowExampleAppPropertyEditor(&show_app_property_editor);
     if (show_app_long_text)           ShowExampleAppLongText(&show_app_long_text);
@@ -3624,7 +3624,7 @@ struct ExampleAppConsole
 
     ExampleAppConsole()
     {
-        Clear// LOG();
+        ClearLog();
         memset(InputBuf, 0, sizeof(InputBuf));
         HistoryPos = -1;
         Commands.push_back("HELP");
@@ -3633,11 +3633,11 @@ struct ExampleAppConsole
         Commands.push_back("CLASSIFY");  // "classify" is only here to provide an example of "C"+[tab] completing to "CL" and displaying matches.
         AutoScroll = true;
         ScrollToBottom = false;
-        Add// LOG("Welcome to Dear ImGui!");
+        AddLog("Welcome to Dear ImGui!");
     }
     ~ExampleAppConsole()
     {
-        Clear// LOG();
+        ClearLog();
         for (int i = 0; i < History.Size; i++)
             free(History[i]);
     }
@@ -3648,14 +3648,14 @@ struct ExampleAppConsole
     static char* Strdup(const char* str) { size_t len = strlen(str) + 1; void* buf = malloc(len); IM_ASSERT(buf); return (char*)memcpy(buf, (const void*)str, len); }
     static void  Strtrim(char* str) { char* str_end = str + strlen(str); while (str_end > str&& str_end[-1] == ' ') str_end--; *str_end = 0; }
 
-    void    Clear// LOG()
+    void    ClearLog()
     {
         for (int i = 0; i < Items.Size; i++)
             free(Items[i]);
         Items.clear();
     }
 
-    void    Add// LOG(const char* fmt, ...) IM_FMTARGS(2)
+    void    AddLog(const char* fmt, ...) IM_FMTARGS(2)
     {
         // FIXME-OPT
         char buf[1024];
@@ -3690,11 +3690,11 @@ struct ExampleAppConsole
 
         // TODO: display items starting from the bottom
 
-        if (ImGui::SmallButton("Add Dummy Text")) { Add// LOG("%d some text", Items.Size); Add// LOG("some more text"); Add// LOG("display very important message here!"); } ImGui::SameLine();
-        if (ImGui::SmallButton("Add Dummy Error")) { Add// LOG("[error] something went wrong"); } ImGui::SameLine();
-        if (ImGui::SmallButton("Clear")) { Clear// LOG(); } ImGui::SameLine();
+        if (ImGui::SmallButton("Add Dummy Text")) { AddLog("%d some text", Items.Size); AddLog("some more text"); AddLog("display very important message here!"); } ImGui::SameLine();
+        if (ImGui::SmallButton("Add Dummy Error")) { AddLog("[error] something went wrong"); } ImGui::SameLine();
+        if (ImGui::SmallButton("Clear")) { ClearLog(); } ImGui::SameLine();
         bool copy_to_clipboard = ImGui::SmallButton("Copy");
-        //static float t = 0.0f; if (ImGui::GetTime() - t > 0.02f) { t = ImGui::GetTime(); Add// LOG("Spam %f", t); }
+        //static float t = 0.0f; if (ImGui::GetTime() - t > 0.02f) { t = ImGui::GetTime(); AddLog("Spam %f", t); }
 
         ImGui::Separator();
 
@@ -3716,7 +3716,7 @@ struct ExampleAppConsole
         ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar); // Leave room for 1 separator + 1 InputText
         if (ImGui::BeginPopupContextWindow())
         {
-            if (ImGui::Selectable("Clear")) Clear// LOG();
+            if (ImGui::Selectable("Clear")) ClearLog();
             ImGui::EndPopup();
         }
 
@@ -3781,7 +3781,7 @@ struct ExampleAppConsole
 
     void    ExecCommand(const char* command_line)
     {
-        Add// LOG("# %s\n", command_line);
+        AddLog("# %s\n", command_line);
 
         // Insert into history. First find match and delete it so it can be pushed to the back. This isn't trying to be smart or optimal.
         HistoryPos = -1;
@@ -3797,23 +3797,23 @@ struct ExampleAppConsole
         // Process command
         if (Stricmp(command_line, "CLEAR") == 0)
         {
-            Clear// LOG();
+            ClearLog();
         }
         else if (Stricmp(command_line, "HELP") == 0)
         {
-            Add// LOG("Commands:");
+            AddLog("Commands:");
             for (int i = 0; i < Commands.Size; i++)
-                Add// LOG("- %s", Commands[i]);
+                AddLog("- %s", Commands[i]);
         }
         else if (Stricmp(command_line, "HISTORY") == 0)
         {
             int first = History.Size - 10;
             for (int i = first > 0 ? first : 0; i < History.Size; i++)
-                Add// LOG("%3d: %s\n", i, History[i]);
+                AddLog("%3d: %s\n", i, History[i]);
         }
         else
         {
-            Add// LOG("Unknown command: '%s'\n", command_line);
+            AddLog("Unknown command: '%s'\n", command_line);
         }
 
         // On commad input, we scroll to bottom even if AutoScroll==false
@@ -3828,7 +3828,7 @@ struct ExampleAppConsole
 
     int     TextEditCallback(ImGuiInputTextCallbackData* data)
     {
-        //Add// LOG("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
+        //AddLog("cursor: %d, selection: %d-%d", data->CursorPos, data->SelectionStart, data->SelectionEnd);
         switch (data->EventFlag)
         {
         case ImGuiInputTextFlags_CallbackCompletion:
@@ -3855,7 +3855,7 @@ struct ExampleAppConsole
             if (candidates.Size == 0)
             {
                 // No match
-                Add// LOG("No match for \"%.*s\"!\n", (int)(word_end - word_start), word_start);
+                AddLog("No match for \"%.*s\"!\n", (int)(word_end - word_start), word_start);
             }
             else if (candidates.Size == 1)
             {
@@ -3889,9 +3889,9 @@ struct ExampleAppConsole
                 }
 
                 // List matches
-                Add// LOG("Possible matches:\n");
+                AddLog("Possible matches:\n");
                 for (int i = 0; i < candidates.Size; i++)
-                    Add// LOG("- %s\n", candidates[i]);
+                    AddLog("- %s\n", candidates[i]);
             }
 
             break;
@@ -3934,21 +3934,21 @@ static void ShowExampleAppConsole(bool* p_open)
 }
 
 //-----------------------------------------------------------------------------
-// [SECTION] Example App: Debug Log / ShowExampleApp// LOG()
+// [SECTION] Example App: Debug Log / ShowExampleAppLog()
 //-----------------------------------------------------------------------------
 
 // Usage:
 //  static ExampleAppLog my_log;
-//  my_log.Add// LOG("Hello %d world\n", 123);
+//  my_log.AddLog("Hello %d world\n", 123);
 //  my_log.Draw("title");
 struct ExampleAppLog
 {
     ImGuiTextBuffer     Buf;
     ImGuiTextFilter     Filter;
-    ImVector<int>       LineOffsets;        // Index to lines offset. We maintain this with Add// LOG() calls, allowing us to have a random access on lines
+    ImVector<int>       LineOffsets;        // Index to lines offset. We maintain this with AddLog() calls, allowing us to have a random access on lines
     bool                AutoScroll;     // Keep scrolling if already at the bottom
 
-    ExampleApp// LOG()
+    ExampleAppLog()
     {
         AutoScroll = true;
         Clear();
@@ -3961,7 +3961,7 @@ struct ExampleAppLog
         LineOffsets.push_back(0);
     }
 
-    void    Add// LOG(const char* fmt, ...) IM_FMTARGS(2)
+    void    AddLog(const char* fmt, ...) IM_FMTARGS(2)
     {
         int old_size = Buf.size();
         va_list args;
@@ -4058,7 +4058,7 @@ struct ExampleAppLog
 };
 
 // Demonstrate creating a simple log window with basic filtering.
-static void ShowExampleApp// LOG(bool* p_open)
+static void ShowExampleAppLog(bool* p_open)
 {
     static ExampleAppLog log;
 
@@ -4074,7 +4074,7 @@ static void ShowExampleApp// LOG(bool* p_open)
         {
             const char* categories[3] = { "info", "warn", "error" };
             const char* words[] = { "Bumfuzzled", "Cattywampus", "Snickersnee", "Abibliophobia", "Absquatulate", "Nincompoop", "Pauciloquent" };
-            log.Add// LOG("[%05d] [%s] Hello, current time is %.1f, here's a word: '%s'\n",
+            log.AddLog("[%05d] [%s] Hello, current time is %.1f, here's a word: '%s'\n",
                 ImGui::GetFrameCount(), categories[counter % IM_ARRAYSIZE(categories)], ImGui::GetTime(), words[counter % IM_ARRAYSIZE(words)]);
             counter++;
         }

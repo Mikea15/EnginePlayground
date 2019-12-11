@@ -57,6 +57,8 @@ add_library(
 	Renderer/Renderer.h
 	Renderer/RenderTarget.cpp
 	Renderer/RenderTarget.h
+	Renderer/SimpleRenderer.cpp
+	Renderer/SimpleRenderer.h
 
 	Resources/MeshLoader.cpp
 	Resources/MeshLoader.h

@@ -43,10 +43,10 @@ bool SDLHandler::Init()
 	m_window = SDL_CreateWindow( m_windowParams.WindowName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
 		width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
-	m_mainGLContext = SDL_GL_CreateContext(m_window);
-	
 	const bool initialSetup = true;
 	SetWindowParameters(m_windowParams, initialSetup);
+	
+	m_mainGLContext = SDL_GL_CreateContext(m_window);
 
 	glewInit();
 
@@ -114,6 +114,8 @@ void SDLHandler::SetWindowParameters(const WindowParams& params, bool initialSet
 			m_windowParams.Height = dm->h;
 		}
 	}
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, m_windowParams.GL_Flags);
 	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, m_params->GL_ProfileMask);

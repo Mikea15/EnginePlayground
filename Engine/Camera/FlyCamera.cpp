@@ -8,66 +8,78 @@
 #include <glm/gtx/compatibility.hpp>
 
 
-FlyCamera::FlyCamera(glm::vec3 position, glm::vec3 forward, glm::vec3 up) : Camera(position, forward, up)
+FlyCamera::FlyCamera(glm::vec3 position, glm::vec3 forward, glm::vec3 up) 
+	: Camera(position, forward, up)
+	, m_yaw(0.0f)
+	, m_pitch(0.0f)
+	, m_targetPitch(0.0f)
+	, m_targetYaw(0.0f)
 {
-	Yaw = -90.0f;
-
-	Forward = forward;
-	m_WorldUp = Up;
-	m_TargetPosition = position;
+	m_worldUp = up;
+	m_targetPosition = position;
 }
 
-void FlyCamera::Update(float dt)
+void FlyCamera::Update(float deltaTime)
 {
-	Camera::Update(dt);
-	// slowly interpolate to target position each frame given some damping factor.
-	// this gives smooth camera movement that fades out the closer we are to our target.
-	Position = glm::lerp(Position, m_TargetPosition, glm::clamp(dt * Damping, 0.0f, 1.0f));
-	Yaw = glm::lerp(Yaw, m_TargetYaw, glm::clamp(dt * Damping * 2.0f, 0.0f, 1.0f));
-	Pitch = glm::lerp(Pitch, m_TargetPitch, glm::clamp(dt * Damping * 2.0f, 0.0f, 1.0f));
+	Camera::Update(deltaTime);
 
-	// calculate new Cartesian basis vectors from yaw/pitch pair:
-	glm::vec3 newForward;
-	newForward.x = cos(0.0174533 * Pitch) * cos(0.0174533 * Yaw);
-	newForward.y = sin(0.0174533 * Pitch);
-	newForward.z = cos(0.0174533 * Pitch) * sin(0.0174533 * Yaw);
-	Forward = glm::normalize(newForward);
-	Right = glm::normalize(glm::cross(Forward, m_WorldUp));
-	Up = glm::cross(Right, Forward);
+	m_position = glm::lerp(m_position, m_targetPosition, glm::clamp(deltaTime * m_damping, 0.0f, 1.0f));
+	m_yaw = glm::lerp(m_yaw, m_targetYaw, glm::clamp(deltaTime * m_damping * 2.0f, 0.0f, 1.0f));
+	m_pitch = glm::lerp(m_pitch, m_targetPitch, glm::clamp(deltaTime * m_damping * 2.0f, 0.0f, 1.0f));
 
-	// calculate the new view matrix
+	// calculate new cartesian basis vectors from yaw/pitch pair:
+	constexpr float radian = glm::radians(1.0f);
+	glm::vec3 forward(
+		cos(radian * m_pitch) * cos(radian * m_yaw),
+		sin(radian * m_pitch),
+		cos(radian * m_pitch) * sin(radian * m_yaw)
+	);
+
+	m_forward = glm::normalize(forward);
+	m_right = glm::normalize(glm::cross(m_forward, m_worldUp));
+	m_up = glm::cross(m_right, m_forward);
+
 	UpdateView();
 }
 
 void FlyCamera::InputKey(float deltaTime, glm::vec3 moveInput, bool boostSpeed)
 {
-	const float velocity = MovementSpeed * (boostSpeed ? 2.0f : 1.0f) * deltaTime;
+	const float velocity = m_speed * (boostSpeed ? m_boostSpeedFactor : 1.0f) * deltaTime;
 
-	glm::vec3 movement = Right * moveInput.x + m_WorldUp * moveInput.y + Forward * moveInput.z;
+	glm::vec3 movement = m_right * moveInput.x + m_worldUp * moveInput.y + m_forward * moveInput.z;
 
-	m_TargetPosition = m_TargetPosition + movement * velocity;
+	m_targetPosition = m_targetPosition + movement * velocity;
 }
 
 void FlyCamera::InputMouse(float deltaX, float deltaY)
 {
-	float xmovement = deltaX * MouseSensitivty;
-	float ymovement = deltaY * MouseSensitivty;
+	m_targetYaw += deltaX * m_mouseSensitivity;
+	m_targetPitch += deltaY * m_mouseSensitivity;
 
-	m_TargetYaw += xmovement;
-	m_TargetPitch += ymovement;
+	if (m_targetYaw == 0.0f) { m_targetYaw = 0.01f; }
+	if (m_targetPitch == 0.0f) { m_targetPitch = 0.01f; }
 
-	// prevents calculating the length of the null vector
-	if (m_TargetYaw == 0.0f) m_TargetYaw = 0.01f;
-	if (m_TargetPitch == 0.0f) m_TargetPitch = 0.01f;
+	if (m_targetPitch > s_maxPitchAngle)
+	{
+		m_targetPitch = s_maxPitchAngle;
+	}
 
-	// it's not allowed to move the pitch above or below 90 degrees asctime the current 
-	// world-up vector would break our LookAt calculation.
-	if (m_TargetPitch > 89.0f)  m_TargetPitch = 89.0f;
-	if (m_TargetPitch < -89.0f) m_TargetPitch = -89.0f;
+	if (m_targetPitch < -s_maxPitchAngle)
+	{
+		m_targetPitch = -s_maxPitchAngle;
+	}
 }
 
-void FlyCamera::InputScroll(float deltaX, float deltaY)
+void FlyCamera::InputScroll(float delta)
 {
-	MovementSpeed = glm::clamp(MovementSpeed + deltaY * 1.0f, 1.0f, 25.0f);
-	Damping = glm::clamp(Damping + deltaX * 0.5f, 1.0f, 25.0f);
+	m_properties.m_fov += delta;
+	if (m_properties.m_fov < s_minFov)
+	{
+		m_properties.m_fov = s_minFov;
+	}
+	else if (m_properties.m_fov > s_maxFov)
+	{
+		m_properties.m_fov = s_maxFov;
+	}
+
 }

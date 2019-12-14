@@ -49,7 +49,7 @@ public:
 		struct
 		{
 			FrustumPlane Left;
-			FrustumPlane Right;
+			FrustumPlane m_right;
 			FrustumPlane Top;
 			FrustumPlane Bottom;
 			FrustumPlane Near;

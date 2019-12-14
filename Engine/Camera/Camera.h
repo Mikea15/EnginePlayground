@@ -4,18 +4,6 @@
 
 #include "CameraFrustum.h"
 
-
-// defines several possible options for camera movement. Used as abstraction to stay away from 
-// window-system specific input methods.
-enum CAMERA_MOVEMENT {
-	CAMERA_FORWARD,
-	CAMERA_BACK,
-	CAMERA_LEFT,
-	CAMERA_RIGHT,
-	CAMERA_UP,
-	CAMERA_DOWN,
-};
-
 /*
 
   Basic root camera. Only does relevant camera calculations with manual forced direction
@@ -28,27 +16,32 @@ enum CAMERA_MOVEMENT {
 class Camera
 {
 public:
-	glm::mat4 Projection;
-	glm::mat4 View;
+	struct Properties
+	{
+		float m_fov = 70.0f;
+		float m_aspectRatio = 16.0f / 9.0f;
+		float m_nearPlane = 0.01f;
+		float m_farPlane = 1000.0f;
+		bool m_isPerspective = false;
 
-	glm::vec3 Position = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 Forward = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 Right = glm::vec3(1.0f, 0.0f, 0.0f);
+		bool operator==(const Properties& rhs) {
+			if (m_fov != rhs.m_fov) return false;
+			if (m_aspectRatio != rhs.m_aspectRatio) return false;
+			if (m_nearPlane != rhs.m_nearPlane) return false;
+			if (m_farPlane != rhs.m_farPlane) return false;
+			if (m_isPerspective != rhs.m_isPerspective) return false;
+			return true;
+		}
 
-	float FOV;
-	float Aspect;
-	float Near;
-	float Far;
-	bool  Perspective;
+		bool operator!=(const Properties& rhs) {
+			return !(*this == rhs);
+		}
+	};
 
-	CameraFrustum Frustum;
-private:
-public:
 	Camera();
-	Camera(glm::vec3 position, glm::vec3 forward, glm::vec3 up);
+	Camera(glm::vec3 position, glm::vec3 forward = glm::vec3(0, 0, -1), glm::vec3 up = glm::vec3(0, 1, 0));
 
-	void Update(float dt);
+	void Update(float deltaTime);
 
 	void SetPerspective(float fov, float aspect, float near, float far);
 	void SetOrthographic(float left, float right, float top, float bottom, float near, float far);
@@ -58,5 +51,48 @@ public:
 	float FrustumHeightAtDistance(float distance);
 	float DistanceAtFrustumHeight(float frustumHeight);
 
-};
+	const glm::vec3& GetPosition() const { return m_position; }
+	void SetPosition(const glm::vec3& position) { m_position = position; }
 
+	const glm::mat4& GetView() const { return m_view; }
+	const glm::mat4& GetProjection() const { return m_projection; }
+	const glm::mat4& GetViewProjection() const { return m_projection * m_view; }
+
+	const glm::vec3& GetUp() const { return m_up; }
+	const glm::vec3& GetForward() const { return m_forward; }
+	const glm::vec3& GetRight() const { return m_right; }
+
+	CameraFrustum GetFrustum() { return m_frustum; }
+
+	bool IsOrthographic() const { return m_properties.m_isPerspective; }
+
+	const Properties& GetProperties() const { return m_properties; }
+	void SetProperties(const Properties& properties);
+
+	float GetFov() const { return m_properties.m_fov; }
+	void SetFov(float fov);
+
+	float GetNearPlane() const { return m_properties.m_nearPlane; }
+	float GetFarPlane() const { return m_properties.m_farPlane; }
+	void SetNearFarPlane(float nearPlane, float farPlane);
+
+	float GetAspectRatio() const { return m_properties.m_aspectRatio; }
+	void SetAspectRatio(float ratio);
+
+protected:
+	glm::mat4 m_projection;
+	glm::mat4 m_view;
+
+	glm::vec3 m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 m_forward = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 m_right = glm::vec3(1.0f, 0.0f, 0.0f);
+
+	CameraFrustum m_frustum;
+
+	Properties m_properties;
+
+	static const float s_minFov;
+	static const float s_maxFov;
+	static const float s_maxPitchAngle;
+};

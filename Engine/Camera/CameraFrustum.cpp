@@ -6,32 +6,32 @@
 // ------------------------------------------------------------------------
 void CameraFrustum::Update(Camera* camera)
 {
-	float tan = 2.0 * std::tan(camera->FOV * 0.5);
-	float nearHeight = tan * camera->Near;
-	float nearWidth = nearHeight * camera->Aspect;
-	float farHeight = tan * camera->Far;
-	float farWidth = farHeight * camera->Aspect;
+	float tan = 2.0 * std::tan(camera->GetFov() * 0.5);
+	float nearHeight = tan * camera->GetNearPlane();
+	float nearWidth = nearHeight * camera->GetAspectRatio();
+	float farHeight = tan * camera->GetFarPlane();
+	float farWidth = farHeight * camera->GetAspectRatio();
 
-	glm::vec3 nearCenter = camera->Position + camera->Forward * camera->Near;
-	glm::vec3 farCenter = camera->Position + camera->Forward * camera->Far;
+	glm::vec3 nearCenter = camera->GetPosition() + camera->GetForward() * camera->GetNearPlane();
+	glm::vec3 farCenter = camera->GetPosition() + camera->GetForward() * camera->GetFarPlane();
 
 	glm::vec3 v;
 	// left plane
-	v = (nearCenter - camera->Right * nearWidth * 0.5f) - camera->Position;
-	Left.SetNormalD(glm::cross(glm::normalize(v), camera->Up), nearCenter - camera->Right * nearWidth * 0.5f);
+	v = (nearCenter - camera->GetRight() * nearWidth * 0.5f) - camera->GetPosition();
+	Left.SetNormalD(glm::cross(glm::normalize(v), camera->GetUp()), nearCenter - camera->GetRight() * nearWidth * 0.5f);
 	// right plane
-	v = (nearCenter + camera->Right * nearWidth * 0.5f) - camera->Position;
-	Right.SetNormalD(glm::cross(camera->Up, glm::normalize(v)), nearCenter + camera->Right * nearWidth * 0.5f);
+	v = (nearCenter + camera->GetRight() * nearWidth * 0.5f) - camera->GetPosition();
+	m_right.SetNormalD(glm::cross(camera->GetUp(), glm::normalize(v)), nearCenter + camera->GetRight() * nearWidth * 0.5f);
 	// top plane
-	v = (nearCenter + camera->Up * nearHeight * 0.5f) - camera->Position;
-	Top.SetNormalD(glm::cross(glm::normalize(v), camera->Right), nearCenter + camera->Up * nearHeight * 0.5f);
+	v = (nearCenter + camera->GetUp() * nearHeight * 0.5f) - camera->GetPosition();
+	Top.SetNormalD(glm::cross(glm::normalize(v), camera->GetRight()), nearCenter + camera->GetUp() * nearHeight * 0.5f);
 	// bottom plane
-	v = (nearCenter - camera->Up * nearHeight * 0.5f) - camera->Position;
-	Bottom.SetNormalD(glm::cross(camera->Right, glm::normalize(v)), nearCenter - camera->Up * nearHeight * 0.5f);
+	v = (nearCenter - camera->GetUp() * nearHeight * 0.5f) - camera->GetPosition();
+	Bottom.SetNormalD(glm::cross(camera->GetRight(), glm::normalize(v)), nearCenter - camera->GetUp() * nearHeight * 0.5f);
 	// near plane
-	Near.SetNormalD(camera->Forward, nearCenter);
+	Near.SetNormalD(camera->GetForward(), nearCenter);
 	// far plane
-	Far.SetNormalD(-camera->Forward, farCenter);
+	Far.SetNormalD(-camera->GetForward(), farCenter);
 }
 // ------------------------------------------------------------------------
 bool CameraFrustum::Intersect(glm::vec3 point)

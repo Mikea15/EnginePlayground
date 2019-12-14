@@ -26,7 +26,7 @@ MaterialLibrary::~MaterialLibrary()
 		delete m_Materials[i];
 	}
 	delete debugLightMaterial;
-
+	delete errorMaterial;
 	delete defaultBlitMaterial;
 }
 
@@ -112,6 +112,12 @@ void MaterialLibrary::generateDefaultMaterials()
 	alphaDiscardMaterial->Type = MATERIAL_CUSTOM;
 	alphaDiscardMaterial->Cull = false;
 	m_DefaultMaterials[Utils::Hash("alpha discard")] = alphaDiscardMaterial;
+
+	Shader* defaultFwdShader = Resources::LoadShader("default-fwd", "shaders/textured.vs", "shaders/textured.fs");
+	Material* defaultForwardMat = new Material(defaultFwdShader);
+	defaultForwardMat->SetTexture("TexAlbedo", Resources::LoadTexture("default albedo", "textures/checkerboard.png", GL_TEXTURE_2D, GL_RGB), 0);
+	m_DefaultMaterials[Utils::Hash("default-fwd")] = defaultForwardMat;
+
 }
 
 void MaterialLibrary::generateInternalMaterials(RenderTarget* gBuffer)
@@ -158,4 +164,7 @@ void MaterialLibrary::generateInternalMaterials(RenderTarget* gBuffer)
 	// debug
 	Shader* debugLightShader = Resources::LoadShader("debug light", "shaders/light.vs", "shaders/light.fs");
 	debugLightMaterial = new Material(debugLightShader);
+
+	Shader* debugErrorShader = Resources::LoadShader("debugShader", "shaders/error.vs", "shaders/error.fs");
+	errorMaterial = new Material(debugErrorShader);
 }

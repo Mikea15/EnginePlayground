@@ -39,21 +39,13 @@ void FlyCamera::Update(float dt)
 	UpdateView();
 }
 
-void FlyCamera::InputKey(float dt, CAMERA_MOVEMENT direction)
+void FlyCamera::InputKey(float deltaTime, glm::vec3 moveInput, bool boostSpeed)
 {
-	float speed = MovementSpeed * dt;
-	if (direction == CAMERA_FORWARD)
-		m_TargetPosition = m_TargetPosition + Forward * speed;
-	else if (direction == CAMERA_BACK)
-		m_TargetPosition = m_TargetPosition - Forward * speed;
-	else if (direction == CAMERA_LEFT)
-		m_TargetPosition = m_TargetPosition - Right * speed;
-	else if (direction == CAMERA_RIGHT)
-		m_TargetPosition = m_TargetPosition + Right * speed;
-	else if (direction == CAMERA_UP)
-		m_TargetPosition = m_TargetPosition + m_WorldUp * speed;
-	else if (direction == CAMERA_DOWN)
-		m_TargetPosition = m_TargetPosition - m_WorldUp * speed;
+	const float velocity = MovementSpeed * (boostSpeed ? 2.0f : 1.0f) * deltaTime;
+
+	glm::vec3 movement = Right * moveInput.x + m_WorldUp * moveInput.y + Forward * moveInput.z;
+
+	m_TargetPosition = m_TargetPosition + movement * velocity;
 }
 
 void FlyCamera::InputMouse(float deltaX, float deltaY)

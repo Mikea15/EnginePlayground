@@ -36,6 +36,8 @@ private:
 	Shader* dirShadowShader;
 public:
 	Material* debugLightMaterial;
+	Material* errorMaterial;
+
 public:
 	MaterialLibrary(RenderTarget* gBuffer = nullptr);
 	~MaterialLibrary();

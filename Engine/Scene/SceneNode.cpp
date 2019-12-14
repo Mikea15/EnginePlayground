@@ -167,9 +167,10 @@ void SceneNode::UpdateTransform(bool updatePrevTransform)
 	if (m_isDirty)
 	{
 		// first scale, then rotate, then translation
-		// m_transform = glm::translate(m_position);
+		m_transform = glm::translate(m_position);
 		m_transform = glm::scale(m_transform, m_scale); // TODO: order is off here for some reason, figure out why
-		// m_transform = glm::rotate(m_transform, m_rotation.xyz, m_rotation.w);
+		m_transform = glm::rotate(m_transform, glm::radians(m_rotation.w), glm::vec3(m_rotation.x, m_rotation.y, m_rotation.z));
+
 		if (m_parent)
 		{
 			m_transform = m_parent->m_transform * m_transform;

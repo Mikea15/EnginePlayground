@@ -31,7 +31,7 @@ public:
 
 	virtual void Update(float dt);
 
-	virtual void InputKey(float dt, CAMERA_MOVEMENT direction);
+	virtual void InputKey(float deltaTime, glm::vec3 moveInput, bool boostSpeed);
 	virtual void InputMouse(float deltaX, float deltaY);
 	virtual void InputScroll(float deltaX, float deltaY);
 };

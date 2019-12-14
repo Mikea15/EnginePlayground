@@ -12,6 +12,8 @@
 
 #include "Utils/Logger.h"
 
+#include <stack>
+
 SimpleRenderer::~SimpleRenderer()
 {
 	delete m_materialLibrary;
@@ -52,8 +54,8 @@ void SimpleRenderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transf
 {
 	RenderCommand command;
 	command.Mesh = mesh;
-	// command.Material = material;
-	command.Material = m_materialLibrary->debugLightMaterial;
+	command.Material = material;
+	// command.Material = m_materialLibrary->debugLightMaterial;
 	command.Transform = transform;
 	command.PrevTransform = prevTransform;
 	command.BoxMin = glm::vec3(-10000.0f);
@@ -64,16 +66,32 @@ void SimpleRenderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transf
 
 void SimpleRenderer::PushRender(SceneNode* node)
 {
-	RenderCommand command;
-	command.Mesh = node->Mesh;
-	// command.Material = node->Material;
-	command.Material = m_materialLibrary->debugLightMaterial;
-	command.Transform = node->GetTransform();
-	command.PrevTransform = node->GetPrevTransform();
-	command.BoxMin = node->BoxMin;
-	command.BoxMax = node->BoxMax;
+	node->UpdateTransform(true);
 
-	m_renderCommands.push_back(command);
+	std::stack<SceneNode*> nodeStack;
+	nodeStack.push(node);
+	while (!nodeStack.empty())
+	{
+		SceneNode* currentNode = nodeStack.top();
+		nodeStack.pop();
+
+		if (currentNode->Mesh != nullptr) 
+		{
+			RenderCommand command;
+			command.Mesh = currentNode->Mesh;
+			command.Material = currentNode->Material;
+			command.Transform = currentNode->GetTransform();
+			command.PrevTransform = currentNode->GetPrevTransform();
+			command.BoxMin = currentNode->BoxMin;
+			command.BoxMax = currentNode->BoxMax;
+			m_renderCommands.push_back(command);
+		}
+
+		for (SceneNode* childNode : currentNode->GetChildren())
+		{
+			nodeStack.push(childNode);
+		}
+	}
 }
 
 void SimpleRenderer::RenderPushedCommands()

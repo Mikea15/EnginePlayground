@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 
 class Scene;
 class Mesh;
@@ -64,10 +65,10 @@ private:
 	SceneNode* m_parent;
 
 	// per-node transform (w/ parent-child relationship)
-	glm::mat4 m_transform;
-	glm::mat4 m_prevTransform;
+	glm::mat4 m_transform = glm::identity<glm::mat4>();
+	glm::mat4 m_prevTransform = glm::identity<glm::mat4>();
 	glm::vec3 m_position = glm::vec3(0.0f);
-	glm::vec4 m_rotation;
+	glm::vec4 m_rotation{};
 	glm::vec3 m_scale = glm::vec3(1.0f);
 
 	bool m_isDirty;

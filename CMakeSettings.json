@@ -30,7 +30,13 @@
       "ctestCommandArgs": "",
       "cmakeToolchain": "",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": [],
+      "variables": [
+        {
+          "name": "ASSIMP_LIBRARY_SUFFIX",
+          "value": "-vc141-mt",
+          "type": "STRING"
+        }
+      ],
       "cmakeToolchain": "D:/vcpkg/scripts/buildsystems/vcpkg.cmake"
     }
   ]

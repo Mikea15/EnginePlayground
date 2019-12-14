@@ -15,6 +15,8 @@ union SDL_Event;
 #include "Mesh/Torus.h"
 #include "Mesh/Cube.h"
 
+#include "Utils/Utils.h"
+
 class State
 {
 public:
@@ -97,6 +99,26 @@ public:
 		plasmaOrb->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		plasmaOrb->SetScale(0.6f);
 
+		const float spacing = 5.2f;
+		for (int x = 0; x < 10; ++x)
+		{
+			for (int z = 0; z < 10; ++z)
+			{
+				for (int y = 0; y < 10; ++y)
+				{
+					glm::vec3 position = glm::vec3(0.0f, 0.5f, 0.0f) + glm::vec3(x - 5, y, z - 5) * spacing;
+
+					SceneNode* node = Scene::MakeSceneNode(tSphere, defaultForwardMat);
+					node->SetPosition(position);
+
+					const float randomScale = Utils::Rand(0.5f, 2.3f);
+					node->SetScale(randomScale);
+
+					m_randomNodes.push_back(node);
+				}
+			}
+		}
+
 		//// - background
 		//Skybox* background = new Skybox;
 		//PBRCapture* pbrEnv = rendererPtr->GetSkypCature();
@@ -170,6 +192,11 @@ public:
 		renderer->PushRender(plasmaOrb);
 		// renderer->PushRender(background);
 
+		for (SceneNode* node : m_randomNodes)
+		{
+			renderer->PushRender(node);
+		}
+
 		renderer->RenderPushedCommands();
 	};
 
@@ -195,6 +222,8 @@ private:
 	SceneNode* thirdTorus;
 	SceneNode* plasmaOrb;
 	SceneNode* planeNode;
+
+	std::vector<SceneNode*> m_randomNodes;
 
 	bool m_inputGrabMouse = false;
 	float m_inputMoveUp = 0.0f;

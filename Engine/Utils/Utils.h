@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <cstdlib>
 
 #include <glm/glm.hpp>
 #include <imgui.h>
@@ -43,6 +44,16 @@ namespace Utils
 	static unsigned int Hash(const std::string& text)
 	{
 		return static_cast<unsigned int>(std::hash<std::string>{}(text));
+	}
+
+	static float Rand01()
+	{
+		return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	}
+
+	static float Rand(float min, float max)
+	{
+		return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
 	}
 }
 

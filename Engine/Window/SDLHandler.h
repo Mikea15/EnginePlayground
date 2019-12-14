@@ -49,6 +49,10 @@ public:
 	const SDL_DisplayMode* GetCurrentDisplayMode();
 
 	const WindowParams& GetWindowParams() const { return m_windowParams; }
+	const Uint32 GetWindowID() const { return SDL_GetWindowID(m_window); }
+	const bool IsRequestingExit() const { return m_requestExit; }
+
+	const void OnExitWindow(std::function<void(void)> callback);
 
 	void RenderUI();
 
@@ -79,6 +83,10 @@ private:
 	std::unordered_map<int, std::string> m_displayModeIndexToName;
 
 	bool m_lockMouseCursor = false;
+	bool m_requestExit = false;
+
+	// Event Callbacks?
+	std::function<void(void)> m_onExitWindowCallback;
 
 	// statics
 	static std::string s_configFileName;

@@ -29,6 +29,7 @@ void Game::InitSystems()
 	srand(static_cast<unsigned int>(time(NULL)));
 
 	m_sdlHandler.Init();
+	m_sdlHandler.OnExitWindow([this]() { m_isRunning = false; });
 
 	Resources::Init();
 	m_renderer = new SimpleRenderer();
@@ -95,20 +96,18 @@ int Game::Execute()
 			// Handle Input
 			m_sdlHandler.HandleEvents(&event);
 
-			if (event.type == SDL_QUIT)
+			switch (event.type)
 			{
-				m_isRunning = false;
-			}
-			if (event.type == SDL_WINDOWEVENT
-				&& event.window.event == SDL_WINDOWEVENT_CLOSE
-				&& event.window.windowID == SDL_GetWindowID(m_sdlHandler.GetSDLWindow())
-				)
-			{
-				m_isRunning = false;
-			}
-			if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)
-			{
-				m_isRunning = false;
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym)
+				{
+				case SDLK_ESCAPE:
+					m_isRunning = false;
+					break;
+				default: break;
+				}
+				break;
+			default: break;
 			}
 
 			m_gameState->HandleInput(&event);
@@ -133,9 +132,9 @@ int Game::Execute()
 		m_gameState->Render(alpha);
 
 		// ui
-		// m_sdlHandler.BeginUIRender();
-		// m_gameState->RenderUI();
-		// m_sdlHandler.EndUIRender();
+		m_sdlHandler.BeginUIRender();
+		m_gameState->RenderUI();
+		m_sdlHandler.EndUIRender();
 
 		m_sdlHandler.EndRender();
 	}

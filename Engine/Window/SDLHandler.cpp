@@ -66,11 +66,32 @@ void SDLHandler::HandleEvents(SDL_Event* event)
 {
 	m_uiHandler.HandleInput(event);
 
-	if (event->window.event == SDL_WINDOWEVENT_RESIZED)
+	switch (event->type)
 	{
-		m_windowParams.Width = static_cast<int>(event->window.data1);
-		m_windowParams.Height = static_cast<int>(event->window.data2);
-		SDL_SetWindowSize(m_window, m_windowParams.Width, m_windowParams.Height);
+	case SDL_QUIT:
+		m_requestExit = true;
+		m_onExitWindowCallback();
+		break;
+	case SDL_WINDOWEVENT:
+		switch (event->window.event)
+		{
+		case SDL_WINDOWEVENT_CLOSE:
+			m_requestExit = true;
+			m_onExitWindowCallback();
+			break;
+		case SDL_WINDOWEVENT_RESIZED:
+			m_windowParams.Width = static_cast<int>(event->window.data1);
+			m_windowParams.Height = static_cast<int>(event->window.data2);
+			SDL_SetWindowSize(m_window, m_windowParams.Width, m_windowParams.Height);
+			break;
+		case SDL_WINDOWEVENT_FOCUS_GAINED:
+			break;
+		case SDL_WINDOWEVENT_FOCUS_LOST:
+			break;
+		default: break;
+		}
+		break;
+	default: break;
 	}
 }
 
@@ -145,6 +166,11 @@ const SDL_DisplayMode* SDLHandler::GetCurrentDisplayMode()
 		displayMode = &m_displayModes[m_windowParams.ResolutionIndex];
 	}
 	return displayMode;
+}
+
+const void SDLHandler::OnExitWindow(std::function<void(void)> callback)
+{
+	m_onExitWindowCallback = callback;
 }
 
 void SDLHandler::RenderUI()

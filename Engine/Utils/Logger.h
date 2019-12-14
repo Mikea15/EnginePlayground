@@ -30,15 +30,15 @@ private:
 public:
 	static void Log(LEVEL level, const char* szFormat, ...)
 	{
-		static const unsigned int bufferSize = 1024;
+		static const unsigned int s_plotBufferSize = 1024;
 
-		char szBuff[bufferSize];
+		char szBuff[s_plotBufferSize];
 		va_list arg;
 		va_start(arg, szFormat);
-		_vsnprintf_s(szBuff, bufferSize, szFormat, arg);
+		_vsnprintf_s(szBuff, s_plotBufferSize, szFormat, arg);
 		va_end(arg);
 
-		char warning[bufferSize];
+		char warning[s_plotBufferSize];
 		switch (level)
 		{
 		case LEVEL::INFO:
@@ -59,7 +59,7 @@ public:
 			break;
 		}
 
-		char finalBuffer[bufferSize];
+		char finalBuffer[s_plotBufferSize];
 		strcpy_s(finalBuffer, warning);
 		strcat_s(finalBuffer, szBuff);
 		strcat_s(finalBuffer, "\n");

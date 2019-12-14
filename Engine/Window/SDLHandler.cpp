@@ -69,14 +69,12 @@ void SDLHandler::HandleEvents(SDL_Event* event)
 	switch (event->type)
 	{
 	case SDL_QUIT:
-		m_requestExit = true;
 		m_onExitWindowCallback();
 		break;
 	case SDL_WINDOWEVENT:
 		switch (event->window.event)
 		{
 		case SDL_WINDOWEVENT_CLOSE:
-			m_requestExit = true;
 			m_onExitWindowCallback();
 			break;
 		case SDL_WINDOWEVENT_RESIZED:

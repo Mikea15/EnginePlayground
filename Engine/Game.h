@@ -3,9 +3,11 @@
 #include <memory>
 #include <chrono>
 
-#include "Window/SDLHandler.h"
-#include "Renderer/SimpleRenderer.h"
 #include "Camera/FlyCamera.h"
+#include "Renderer/SimpleRenderer.h"
+#include "SystemComponents/SystemComponentManager.h"
+#include "Systems/GameFrameTime.h"
+#include "Window/SDLHandler.h"
 
 class State;
 struct WindowParams;
@@ -34,7 +36,8 @@ private:
 private:
 	bool m_isRunning;
 
-	std::chrono::high_resolution_clock::time_point m_currentTime;
+	GameFrameTime m_frameTime;
+
 	float m_deltaTime = 0.0f;
 	double m_time = 0.0f;
 
@@ -42,5 +45,7 @@ private:
 	// Renderer* m_renderer{};
 	State* m_gameState{};
 	SDLHandler m_sdlHandler;
+
+	SystemComponentManager* m_systemComponents{};
 };
 

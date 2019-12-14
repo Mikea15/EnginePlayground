@@ -46,7 +46,7 @@ public:
 		renderer->SetCamera(&m_camera);
 
 		// basic shapes
-		plane = new Plane(16, 16);
+		plane = new Plane(50, 50);
 		sphere = new Sphere(64, 64);
 		tSphere = new Sphere(256, 256);
 		torus = new Torus(2.0f, 0.4f, 32, 32);
@@ -78,7 +78,8 @@ public:
 		mainTorus = Scene::MakeSceneNode(torus, defaultForwardMat);
 		secondTorus = Scene::MakeSceneNode(torus, defaultForwardMat);
 		thirdTorus = Scene::MakeSceneNode(torus, defaultForwardMat);
-		//plasmaOrb = Scene::MakeSceneNode(tSphere, defaultForwardMat);
+		plasmaOrb = Scene::MakeSceneNode(tSphere, defaultForwardMat);
+		planeNode = Scene::MakeSceneNode(plane, defaultForwardMat);
 
 		mainTorus->AddChild(secondTorus);
 		secondTorus->AddChild(thirdTorus);
@@ -86,11 +87,15 @@ public:
 		mainTorus->SetScale(1.0f);
 		mainTorus->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		secondTorus->SetScale(0.65f);
-		secondTorus->SetRotation(glm::vec4(0.0, 1.0, 0.0, glm::radians(90.0f)));
+		secondTorus->SetRotation(glm::vec4(0.0, 1.0, 0.0, 90.0f));
 		thirdTorus->SetScale(0.65f);
 
-		//plasmaOrb->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-		//plasmaOrb->SetScale(0.6f);
+		planeNode->SetPosition(glm::vec3(0.0f));
+		planeNode->SetScale(10.0f);
+		planeNode->SetRotation(glm::vec4(1.0f, 0.0f, 0.0f, -90.f));
+
+		plasmaOrb->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		plasmaOrb->SetScale(0.6f);
 
 		//// - background
 		//Skybox* background = new Skybox;
@@ -159,19 +164,13 @@ public:
 
 	void Render(float alpha = 1.0f) override 
 	{
-		{
-			//CLOCK(PUSH);
-			renderer->PushRender(mainTorus);
-			// renderer->PushRender(sponza);
-			// renderer->PushRender(plasmaOrb);
-			// renderer->PushRender(background);
-		}
+		renderer->PushRender(planeNode);
+		renderer->PushRender(mainTorus);
+		// renderer->PushRender(sponza);
+		renderer->PushRender(plasmaOrb);
+		// renderer->PushRender(background);
 
-		{
-			//CLOCK(RENDER);
-			// request Cell to render all currently pushed commands
-			renderer->RenderPushedCommands();
-		}
+		renderer->RenderPushedCommands();
 	};
 
 	void RenderUI() {};
@@ -195,6 +194,7 @@ private:
 	SceneNode* secondTorus;
 	SceneNode* thirdTorus;
 	SceneNode* plasmaOrb;
+	SceneNode* planeNode;
 
 	bool m_inputGrabMouse = false;
 	float m_inputMoveUp = 0.0f;

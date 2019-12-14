@@ -86,6 +86,14 @@ add_library(
 	Shading/TextureCube.cpp
 	Shading/TextureCube.h
 
+	SystemComponents/StatSystemComponent.cpp
+	SystemComponents/StatSystemComponent.h
+	SystemComponents/SystemComponentManager.cpp
+	SystemComponents/SystemComponentManager.h
+
+	Systems/GameFrameTime.cpp
+	Systems/GameFrameTime.h
+
 	Utils/FileIO.h
 	Utils/Logger.h
 	Utils/Utils.h

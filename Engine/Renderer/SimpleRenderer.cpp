@@ -77,13 +77,16 @@ void SimpleRenderer::PushRender(SceneNode* node)
 
 		if (currentNode->Mesh != nullptr) 
 		{
+			const glm::vec3 boxMinWorld = node->GetWorldPosition() + (node->GetWorldScale() * node->BoxMin);
+			const glm::vec3 boxMaxWorld = node->GetWorldPosition() + (node->GetWorldScale() * node->BoxMax);
+
 			RenderCommand command;
 			command.Mesh = currentNode->Mesh;
 			command.Material = currentNode->Material;
 			command.Transform = currentNode->GetTransform();
 			command.PrevTransform = currentNode->GetPrevTransform();
-			command.BoxMin = currentNode->BoxMin;
-			command.BoxMax = currentNode->BoxMax;
+			command.BoxMin = boxMinWorld;
+			command.BoxMax = boxMaxWorld;
 			m_renderCommands.push_back(command);
 		}
 
@@ -100,12 +103,17 @@ void SimpleRenderer::RenderPushedCommands()
 	glViewport(0, 0, m_renderTargetWidth, m_renderTargetHeight);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	const glm::mat4 view = m_camera->View;
-	const glm::mat4 projection = m_camera->Projection;
-	const glm::vec3 cameraPosition = m_camera->Position;
+	const glm::mat4 view = m_camera->GetView();
+	const glm::mat4 projection = m_camera->GetProjection();
+	const glm::vec3 cameraPosition = m_camera->GetPosition();
 
 	for (RenderCommand rc : m_renderCommands)
 	{
+		// Frustum Culling.
+		if (!m_camera->GetFrustum().Intersect(rc.BoxMin, rc.BoxMax)) {
+			continue;
+		}
+
 		Shader* currentShader = rc.Material->GetShader();
 		currentShader->Use();
 		currentShader->SetMatrix("view", view);

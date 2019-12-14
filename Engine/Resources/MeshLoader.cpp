@@ -177,9 +177,9 @@ Mesh* MeshLoader::parseMesh(aiMesh* aMesh, const aiScene* aScene, glm::vec3& out
 
 Material* MeshLoader::parseMaterial(Renderer* renderer, aiMaterial* aMaterial, const aiScene* aScene, std::string directory)
 {
-	// create a unique default material for each loaded mesh.     
+	// create a unique default material for each loaded mesh
 	Material* material;
-	// check if diffuse texture has alpha, if so: make alpha blend material; 
+	// check if diffuse texture has alpha, if so: make alpha blend material
 	aiString file;
 	aMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &file);
 	std::string diffPath = std::string(file.C_Str());

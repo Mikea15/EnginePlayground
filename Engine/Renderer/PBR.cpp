@@ -91,7 +91,7 @@ void PBR::SetSkyCapture(PBRCapture* capture)
 
 void PBR::AddIrradianceProbe(PBRCapture* capture, glm::vec3 position, float radius)
 {
-	capture->Position = position;
+	capture->m_position = position;
 	capture->Radius = radius;
 	m_CaptureProbes.push_back(capture);
 }
@@ -160,7 +160,7 @@ std::vector<PBRCapture*> PBR::GetIrradianceProbes(glm::vec3 queryPos, float quer
 	std::vector<PBRCapture*> capturesProximity;
 	for (int i = 0; i < m_CaptureProbes.size(); ++i)
 	{
-		float lengthSq = glm::length2((m_CaptureProbes[i]->Position - queryPos));
+		float lengthSq = glm::length2((m_CaptureProbes[i]->m_position - queryPos));
 		if (lengthSq < queryRadius * queryRadius)
 		{
 			m_CaptureProbes.push_back(m_CaptureProbes[i]);
@@ -177,9 +177,9 @@ std::vector<PBRCapture*> PBR::GetIrradianceProbes(glm::vec3 queryPos, float quer
 void PBR::RenderProbes()
 {
 	m_ProbeDebugShader->Use();
-	m_ProbeDebugShader->SetMatrix("projection", m_Renderer->GetCamera()->Projection);
-	m_ProbeDebugShader->SetMatrix("view", m_Renderer->GetCamera()->View);
-	m_ProbeDebugShader->SetVector("CamPos", m_Renderer->GetCamera()->Position);
+	m_ProbeDebugShader->SetMatrix("projection", m_Renderer->GetCamera()->GetProjection());
+	m_ProbeDebugShader->SetMatrix("view", m_Renderer->GetCamera()->GetView());
+	m_ProbeDebugShader->SetVector("CamPos", m_Renderer->GetCamera()->GetPosition());
 
 	// first render the sky capture
 	m_ProbeDebugShader->SetVector("Position", glm::vec3(0.0f, 2.0, 0.0f));
@@ -189,7 +189,7 @@ void PBR::RenderProbes()
 	// then do the same for each capture probe (at their respective location)
 	for (int i = 0; i < m_CaptureProbes.size(); ++i)
 	{
-		m_ProbeDebugShader->SetVector("Position", m_CaptureProbes[i]->Position);
+		m_ProbeDebugShader->SetVector("Position", m_CaptureProbes[i]->m_position);
 		if (m_CaptureProbes[i]->Prefiltered)
 		{
 			m_CaptureProbes[i]->Prefiltered->Bind(0);

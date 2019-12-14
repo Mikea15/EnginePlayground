@@ -128,7 +128,7 @@ std::vector<RenderCommand> CommandBuffer::GetDeferredRenderCommands(bool cull)
 		for (auto it = m_DeferredRenderCommands.begin(); it != m_DeferredRenderCommands.end(); ++it)
 		{
 			RenderCommand command = *it;
-			if (m_Renderer->GetCamera()->Frustum.Intersect(command.BoxMin, command.BoxMax)) {
+			if (m_Renderer->GetCamera()->GetFrustum().Intersect(command.BoxMin, command.BoxMax)) {
 				commands.push_back(command);
 			}
 		}
@@ -149,7 +149,7 @@ std::vector<RenderCommand> CommandBuffer::GetCustomRenderCommands(RenderTarget* 
 		for (auto it = m_CustomRenderCommands[target].begin(); it != m_CustomRenderCommands[target].end(); ++it)
 		{
 			RenderCommand command = *it;
-			if (m_Renderer->GetCamera()->Frustum.Intersect(command.BoxMin, command.BoxMax)) {
+			if (m_Renderer->GetCamera()->GetFrustum().Intersect(command.BoxMin, command.BoxMax)) {
 				commands.push_back(command);
 			}
 		}
@@ -169,7 +169,7 @@ std::vector<RenderCommand> CommandBuffer::GetAlphaRenderCommands(bool cull)
 		for (auto it = m_AlphaRenderCommands.begin(); it != m_AlphaRenderCommands.end(); ++it)
 		{
 			RenderCommand command = *it;
-			if (m_Renderer->GetCamera()->Frustum.Intersect(command.BoxMin, command.BoxMax)) {
+			if (m_Renderer->GetCamera()->GetFrustum().Intersect(command.BoxMin, command.BoxMax)) {
 				commands.push_back(command);
 			}
 		}

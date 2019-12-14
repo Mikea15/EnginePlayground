@@ -357,7 +357,7 @@ void Renderer::RenderPushedCommands()
 		for (auto it = m_PointLights.begin(); it != m_PointLights.end(); ++it)
 		{
 			// only render point lights if within frustum
-			if (m_Camera->Frustum.Intersect((*it)->Position, (*it)->Radius))
+			if (m_Camera->GetFrustum().Intersect((*it)->m_position, (*it)->Radius))
 			{
 				renderDeferredPointLight(*it);
 			}
@@ -391,7 +391,7 @@ void Renderer::RenderPushedCommands()
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 			else
 				glClear(GL_COLOR_BUFFER_BIT);
-			m_Camera->SetPerspective(m_Camera->FOV,
+			m_Camera->SetPerspective(m_Camera->GetFov(),
 				(float)renderTarget->Width / (float)renderTarget->Height,
 				0.1, 100.0f);
 		}
@@ -401,7 +401,7 @@ void Renderer::RenderPushedCommands()
 			// we'll use for post-processing.
 			glViewport(0, 0, m_RenderSize.x, m_RenderSize.y);
 			glBindFramebuffer(GL_FRAMEBUFFER, m_CustomTarget->ID);
-			m_Camera->SetPerspective(m_Camera->FOV, m_RenderSize.x / m_RenderSize.y, 0.1,
+			m_Camera->SetPerspective(m_Camera->GetFov(), m_RenderSize.x / m_RenderSize.y, 0.1,
 				100.0f);
 		}
 
@@ -437,7 +437,7 @@ void Renderer::RenderPushedCommands()
 			command.Material = m_MaterialLibrary->debugLightMaterial;
 			command.Mesh = m_DebugLightMesh;
 			glm::mat4 model;
-			glm::translate(model, (*it)->Position);
+			glm::translate(model, (*it)->m_position);
 			glm::scale(model, glm::vec3(0.25f));
 			command.Transform = model;
 
@@ -463,7 +463,7 @@ void Renderer::RenderPushedCommands()
 			command.Material = m_MaterialLibrary->debugLightMaterial;
 			command.Mesh = m_DebugLightMesh;
 			glm::mat4 model;
-			glm::translate(model, (*it)->Position);
+			glm::translate(model, (*it)->m_position);
 			glm::scale(model, glm::vec3((*it)->Radius));
 			command.Transform = model;
 
@@ -493,7 +493,7 @@ void Renderer::RenderPushedCommands()
 	m_PostProcessor->Blit(this, postProcessingCommands.size() % 2 == 0 ? m_CustomTarget->GetColorTexture(0) : m_PostProcessTarget1->GetColorTexture(0));
 
 	// store view projection as previous view projection for next frame's motion blur
-	m_PrevViewProjection = m_Camera->Projection * m_Camera->View;
+	m_PrevViewProjection = m_Camera->GetProjection() * m_Camera->GetView();
 
 	// clear the command buffer s.t. the next frame/call can start from an empty slate again.
 	m_CommandBuffer->Clear();
@@ -654,9 +654,9 @@ void Renderer::renderCustomCommand(RenderCommand* command, Camera* customCamera,
 	material->GetShader()->Use();
 	if (customCamera) // pass custom camera specific uniform
 	{
-		material->GetShader()->SetMatrix("projection", customCamera->Projection);
-		material->GetShader()->SetMatrix("view", customCamera->View);
-		material->GetShader()->SetVector("CamPos", customCamera->Position);
+		material->GetShader()->SetMatrix("projection", customCamera->GetProjection());
+		material->GetShader()->SetMatrix("view", customCamera->GetView());
+		material->GetShader()->SetVector("CamPos", customCamera->GetPosition());
 	}
 	material->GetShader()->SetMatrix("model", command->Transform);
 	material->GetShader()->SetMatrix("prevModel", command->PrevTransform);
@@ -812,13 +812,13 @@ void Renderer::updateGlobalUBOs()
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, m_GlobalUBO);
 	// transformation matrices
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &(m_Camera->Projection * m_Camera->View)[0][0]); // sizeof(glm::mat4) = 64 bytes
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &(m_Camera->GetProjection() * m_Camera->GetView())[0][0]); // sizeof(glm::mat4) = 64 bytes
 	glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(glm::mat4), &m_PrevViewProjection[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(glm::mat4), &m_Camera->Projection[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 192, sizeof(glm::mat4), &m_Camera->View[0][0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 256, sizeof(glm::mat4), &m_Camera->View[0][0]); // TODO: make inv function in math library
+	glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(glm::mat4), &m_Camera->GetProjection()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 192, sizeof(glm::mat4), &m_Camera->GetView()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 256, sizeof(glm::mat4), &m_Camera->GetView()[0][0]); // TODO: make inv function in math library
 	// scene data
-	glBufferSubData(GL_UNIFORM_BUFFER, 320, sizeof(glm::vec4), &m_Camera->Position[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 320, sizeof(glm::vec4), &m_Camera->GetPosition()[0]);
 	// lighting
 	unsigned int stride = 2 * sizeof(glm::vec4);
 	for (unsigned int i = 0; i < m_DirectionalLights.size() && i < 4; ++i) // no more than 4 directional lights
@@ -828,7 +828,7 @@ void Renderer::updateGlobalUBOs()
 	}
 	for (unsigned int i = 0; i < m_PointLights.size() && i < 8; ++i) //  constrained to max 8 point lights in forward context
 	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride, sizeof(glm::vec4), &m_PointLights[i]->Position[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride, sizeof(glm::vec4), &m_PointLights[i]->m_position[0]);
 		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride + sizeof(glm::vec4), sizeof(glm::vec4), &m_PointLights[i]->Color[0]);
 	}
 }
@@ -855,19 +855,19 @@ void Renderer::renderDeferredAmbient()
 		{
 			PBRCapture* probe = irradianceProbes[i];
 			// only render probe if within frustum
-			if (m_Camera->Frustum.Intersect(probe->Position, probe->Radius))
+			if (m_Camera->GetFrustum().Intersect(probe->m_position, probe->Radius))
 			{
 				probe->Irradiance->Bind(3);
 
 				Shader* irradianceShader = m_MaterialLibrary->deferredIrradianceShader;
 				irradianceShader->Use();
-				irradianceShader->SetVector("camPos", m_Camera->Position);
-				irradianceShader->SetVector("probePos", probe->Position);
+				irradianceShader->SetVector("camPos", m_Camera->GetPosition());
+				irradianceShader->SetVector("probePos", probe->m_position);
 				irradianceShader->SetFloat("probeRadius", probe->Radius);
 				irradianceShader->SetInt("SSAO", m_PostProcessor->SSAO);
 
 				glm::mat4 model;
-				glm::translate(model, probe->Position);
+				glm::translate(model, probe->m_position);
 				glm::scale(model, glm::vec3(probe->Radius));
 				irradianceShader->SetMatrix("model", model);
 
@@ -896,7 +896,7 @@ void Renderer::renderDeferredDirLight(DirectionalLight* light)
 	Shader* dirShader = m_MaterialLibrary->deferredDirectionalShader;
 
 	dirShader->Use();
-	dirShader->SetVector("camPos", m_Camera->Position);
+	dirShader->SetVector("camPos", m_Camera->GetPosition());
 	dirShader->SetVector("lightDir", light->Direction);
 	dirShader->SetVector("lightColor", glm::normalize(light->Color) * light->Intensity);
 	dirShader->SetBool("ShadowsEnabled", Shadows);
@@ -915,13 +915,13 @@ void Renderer::renderDeferredPointLight(PointLight* light)
 	Shader* pointShader = m_MaterialLibrary->deferredPointShader;
 
 	pointShader->Use();
-	pointShader->SetVector("camPos", m_Camera->Position);
-	pointShader->SetVector("lightPos", light->Position);
+	pointShader->SetVector("camPos", m_Camera->GetPosition());
+	pointShader->SetVector("lightPos", light->m_position);
 	pointShader->SetFloat("lightRadius", light->Radius);
 	pointShader->SetVector("lightColor", glm::normalize(light->Color) * light->Intensity);
 
 	glm::mat4 model;
-	glm::translate(model, light->Position);
+	glm::translate(model, light->m_position);
 	glm::scale(model, glm::vec3(light->Radius));
 	pointShader->SetMatrix("model", model);
 

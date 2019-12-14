@@ -6,5 +6,5 @@ int main(int argc, char* argv[])
 {
 	StubState stubState;
 	Game game(&stubState);
-    return game.Execute();
+	return game.Execute();
 }

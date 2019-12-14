@@ -70,8 +70,7 @@ public:
 		m_camera.SetPerspective(glm::radians(90.0f),
 			static_cast<float>(renderer->GetRenderWidth() / renderer->GetRenderHeight()),
 			0.1f, 100.0f);
-		m_camera.Position = glm::vec3(0.0f, 0.0f, 5.0f);
-		m_camera.Yaw = 90.0f;
+		m_camera.SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
 
 		// scene setup
 		debugShader = Resources::LoadShader("debugShader", "shaders/error.vs", "shaders/error.fs");

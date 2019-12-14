@@ -57,8 +57,8 @@ public:
 	Material* Material{};
 
 	// bounding box 
-	glm::vec3 BoxMin = glm::vec3(-99999.0f);
-	glm::vec3 BoxMax = glm::vec3(99999.0f);
+	glm::vec3 BoxMin = glm::vec3(-1.0f);
+	glm::vec3 BoxMax = glm::vec3(1.0f);
 
 private:
 	std::vector<SceneNode*> m_children;
@@ -68,7 +68,7 @@ private:
 	glm::mat4 m_transform = glm::identity<glm::mat4>();
 	glm::mat4 m_prevTransform = glm::identity<glm::mat4>();
 	glm::vec3 m_position = glm::vec3(0.0f);
-	glm::vec4 m_rotation{};
+	glm::vec4 m_rotation = glm::vec4(0, 1, 0, 0);
 	glm::vec3 m_scale = glm::vec3(1.0f);
 
 	bool m_isDirty;

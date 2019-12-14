@@ -180,8 +180,8 @@ void PostProcessor::ProcessPreLighting(Renderer* renderer, RenderTarget* gBuffer
 
 		m_SSAOShader->Use();
 		m_SSAOShader->SetVector("renderSize", renderer->GetRenderSize());
-		m_SSAOShader->SetMatrix("projection", camera->Projection);
-		m_SSAOShader->SetMatrix("view", camera->View);
+		m_SSAOShader->SetMatrix("projection", camera->GetProjection());
+		m_SSAOShader->SetMatrix("view", camera->GetView());
 
 		glBindFramebuffer(GL_FRAMEBUFFER, m_SSAORenderTarget->ID);
 		glViewport(0, 0, m_SSAORenderTarget->Width, m_SSAORenderTarget->Height);

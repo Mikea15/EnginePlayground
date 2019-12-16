@@ -5,7 +5,7 @@
 #include "Mesh/Quad.h"
 #include "CommandBuffer.h"
 #include "PBRCapture.h"
-#include "GLCache.h"
+#include "GLState.h"
 
 #include <string>
 
@@ -57,7 +57,7 @@ public:
 private:
 	// render state
 	CommandBuffer* m_CommandBuffer{};
-	GLCache        m_GLCache;
+	GLState        m_GLCache;
 	glm::vec2      m_RenderSize;
 
 	// lighting

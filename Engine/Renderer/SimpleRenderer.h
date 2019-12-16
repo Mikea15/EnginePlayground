@@ -3,7 +3,10 @@
 #include <vector>
 #include <string>
 
+#include <imgui.h>
+
 #include "RenderCommand.h"
+#include "GLState.h"
 
 class SceneNode;
 class Camera;
@@ -33,6 +36,8 @@ public:
 	int GetRenderWidth() const { return m_renderTargetWidth; }
 	int GetRenderHeight() const { return m_renderTargetHeight; }
 
+	void RenderUIMenu();
+
 private:
 	std::vector<RenderCommand> m_renderCommands;
 
@@ -40,7 +45,10 @@ private:
 	int m_renderTargetWidth;
 
 	Camera* m_camera;
-
+	GLState m_glState;
 	MaterialLibrary* m_materialLibrary;
+
+	bool m_enableGLCache = false;
+	bool m_enableFrustumCulling = false;
 };
 

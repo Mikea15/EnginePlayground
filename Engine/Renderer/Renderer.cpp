@@ -357,7 +357,7 @@ void Renderer::RenderPushedCommands()
 		for (auto it = m_PointLights.begin(); it != m_PointLights.end(); ++it)
 		{
 			// only render point lights if within frustum
-			if (m_Camera->GetFrustum().Intersect((*it)->m_position, (*it)->Radius))
+			if (m_Camera->GetFrustum().Intersect((*it)->Position, (*it)->Radius))
 			{
 				renderDeferredPointLight(*it);
 			}
@@ -437,7 +437,7 @@ void Renderer::RenderPushedCommands()
 			command.Material = m_MaterialLibrary->debugLightMaterial;
 			command.Mesh = m_DebugLightMesh;
 			glm::mat4 model;
-			glm::translate(model, (*it)->m_position);
+			glm::translate(model, (*it)->Position);
 			glm::scale(model, glm::vec3(0.25f));
 			command.Transform = model;
 
@@ -463,7 +463,7 @@ void Renderer::RenderPushedCommands()
 			command.Material = m_MaterialLibrary->debugLightMaterial;
 			command.Mesh = m_DebugLightMesh;
 			glm::mat4 model;
-			glm::translate(model, (*it)->m_position);
+			glm::translate(model, (*it)->Position);
 			glm::scale(model, glm::vec3((*it)->Radius));
 			command.Transform = model;
 
@@ -828,7 +828,7 @@ void Renderer::updateGlobalUBOs()
 	}
 	for (unsigned int i = 0; i < m_PointLights.size() && i < 8; ++i) //  constrained to max 8 point lights in forward context
 	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride, sizeof(glm::vec4), &m_PointLights[i]->m_position[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride, sizeof(glm::vec4), &m_PointLights[i]->Position[0]);
 		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride + sizeof(glm::vec4), sizeof(glm::vec4), &m_PointLights[i]->Color[0]);
 	}
 }
@@ -916,12 +916,12 @@ void Renderer::renderDeferredPointLight(PointLight* light)
 
 	pointShader->Use();
 	pointShader->SetVector("camPos", m_Camera->GetPosition());
-	pointShader->SetVector("lightPos", light->m_position);
+	pointShader->SetVector("lightPos", light->Position);
 	pointShader->SetFloat("lightRadius", light->Radius);
 	pointShader->SetVector("lightColor", glm::normalize(light->Color) * light->Intensity);
 
 	glm::mat4 model;
-	glm::translate(model, light->m_position);
+	glm::translate(model, light->Position);
 	glm::scale(model, glm::vec3(light->Radius));
 	pointShader->SetMatrix("model", model);
 

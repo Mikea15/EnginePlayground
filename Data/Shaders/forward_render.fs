@@ -21,10 +21,15 @@ uniform mat4 lightShadowViewProjection1;
 
 void main()
 {
-    FragColor = vec4(texture(TexAlbedo, TexCoords).rgb, 1.0f);
+    vec4 albedo = texture(TexAlbedo, TexCoords);
+
+#ifdef ALPHA_BLEND
+    FragColor = vec4(albedo.rgb, 0.5f);
+#else
+    FragColor = vec4(albedo.rgb, 1.0f);
+#endif
 
 #if 0
-    vec4 albedo = texture(TexAlbedo, TexCoords);
     #ifdef ALPHA_BLEND
         albedo.rgb *= albedo.a; // pre-multiplied alpha
     #endif

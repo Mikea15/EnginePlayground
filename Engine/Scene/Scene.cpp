@@ -32,6 +32,9 @@ SceneNode* Scene::MakeSceneNode(Mesh* mesh, Material* material)
 	node->Mesh = mesh;
 	node->Material = material;
 
+	node->BoxMin = glm::vec3(-0.5f);
+	node->BoxMax = glm::vec3(0.5f);
+
 	// keep a global rerefence to this scene node s.t. we can clear the scene's nodes for 
 	// memory management: end of program or when switching scenes.
 	Root->AddChild(node);

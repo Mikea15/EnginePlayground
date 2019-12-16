@@ -17,6 +17,9 @@ union SDL_Event;
 
 #include "Utils/Utils.h"
 
+
+#include <stack>
+
 class State
 {
 public:
@@ -49,7 +52,7 @@ public:
 
 		// basic shapes
 		plane = new Plane(50, 50);
-		sphere = new Sphere(64, 64);
+		sphere = new Sphere(32, 32);
 		tSphere = new Sphere(256, 256);
 		torus = new Torus(2.0f, 0.4f, 32, 32);
 		cube = new Cube();
@@ -69,12 +72,13 @@ public:
 		// configure camera
 		m_camera.SetPerspective(glm::radians(90.0f),
 			static_cast<float>(renderer->GetRenderWidth() / renderer->GetRenderHeight()),
-			0.1f, 100.0f);
+			0.01f, 200.0f);
 		m_camera.SetPosition(glm::vec3(0.0f, 0.0f, 5.0f));
 
 		// scene setup
 		debugShader = Resources::LoadShader("debugShader", "shaders/error.vs", "shaders/error.fs");
 		Material* defaultForwardMat = renderer->CreateMaterial("default-fwd");
+		Material* defaultForwardMatAlpha = renderer->CreateMaterial("default-fwd-alpha");
 		Material* debugShaderMat = new Material(debugShader);
 		mainTorus = Scene::MakeSceneNode(torus, defaultForwardMat);
 		secondTorus = Scene::MakeSceneNode(torus, defaultForwardMat);
@@ -93,7 +97,7 @@ public:
 
 		planeNode->SetPosition(glm::vec3(0.0f));
 		planeNode->SetScale(10.0f);
-		planeNode->SetRotation(glm::vec4(1.0f, 0.0f, 0.0f, -90.f));
+		planeNode->SetRotation(glm::vec4(1.0f, 0.0f, 0.0f, 90.f));
 
 		plasmaOrb->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		plasmaOrb->SetScale(0.6f);
@@ -107,7 +111,8 @@ public:
 				{
 					glm::vec3 position = glm::vec3(0.0f, 0.5f, 0.0f) + glm::vec3(x - 5, y, z - 5) * spacing;
 
-					SceneNode* node = Scene::MakeSceneNode(tSphere, defaultForwardMat);
+					float rand = Utils::Rand01();
+					SceneNode* node = Scene::MakeSceneNode(tSphere, rand < 0.5f ? defaultForwardMat : defaultForwardMatAlpha);
 					node->SetPosition(position);
 
 					const float randomScale = Utils::Rand(0.5f, 2.3f);
@@ -199,7 +204,30 @@ public:
 		renderer->RenderPushedCommands();
 	};
 
-	void RenderUI() {};
+	void RenderUI() 
+	{
+		// Menu Bar
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				// ShowExampleMenuFile();
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Edit"))
+			{
+				if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+				if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+				ImGui::Separator();
+				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+				ImGui::EndMenu();
+			}
+			renderer->RenderUIMenu();
+			ImGui::EndMainMenuBar();
+		}
+	};
 	void Cleanup() override {};
 
 private:

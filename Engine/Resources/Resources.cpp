@@ -157,7 +157,7 @@ TextureCube* Resources::GetTextureCube(std::string name)
 	}
 }
 
-SceneNode* Resources::LoadMesh(Renderer* renderer, std::string name, std::string path)
+SceneNode* Resources::LoadMesh(IRenderer* renderer, std::string name, std::string path)
 {
 	unsigned int id = Utils::Hash(name);
 

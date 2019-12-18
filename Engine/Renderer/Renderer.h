@@ -1,11 +1,13 @@
 #pragma once
 
+#include "IRenderer.h"
+
 #include "Lighting/PointLight.h"
 #include "Lighting/DirectionalLight.h"
 #include "Mesh/Quad.h"
 #include "CommandBuffer.h"
 #include "PBRCapture.h"
-#include "GLState.h"
+#include "GLStateCache.h"
 
 #include <string>
 
@@ -42,6 +44,7 @@ class Shader;
 
 */
 class Renderer
+	: public IRenderer
 {
 	friend PostProcessor;
 	friend PBR;
@@ -57,7 +60,7 @@ public:
 private:
 	// render state
 	CommandBuffer* m_CommandBuffer{};
-	GLState        m_GLCache;
+	GLStateCache        m_GLCache;
 	glm::vec2      m_RenderSize;
 
 	// lighting
@@ -115,7 +118,7 @@ public:
 	PostProcessor* GetPostProcessor();
 
 	// create either a deferred default material (based on default set of materials available (like glass)), or a custom material (with custom you have to supply your own shader)
-	Material* CreateMaterial(std::string base = "default"); // these don't have the custom flag set (default material has default state and uses checkerboard texture as albedo (and black metallic, half roughness, purple normal, white ao)
+	Material* CreateMaterial(std::string base = "default") override; // these don't have the custom flag set (default material has default state and uses checkerboard texture as albedo (and black metallic, half roughness, purple normal, white ao)
 	Material* CreateCustomMaterial(Shader* shader);         // these have the custom flag set (will be rendered in forward pass)
 	Material* CreatePostProcessingMaterial(Shader* shader); // these have the post-processing flag set (will be rendered after deferred/forward pass)
 

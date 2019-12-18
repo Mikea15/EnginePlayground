@@ -3,8 +3,6 @@
 #include <GL/glew.h>
 #include <string>
 
-
-
 class Texture;
 class TextureCube;
 

@@ -12,7 +12,7 @@ struct aiMaterial;
 struct aiString;
 
 
-class Renderer;
+class IRenderer;
 class SceneNode;
 class Mesh;
 class Material;
@@ -29,11 +29,11 @@ private:
 	static std::vector<Mesh*> meshStore;
 public:
 	static void       Clean();
-	static SceneNode* LoadMesh(Renderer* renderer, std::string path, bool setDefaultMaterial = true);
+	static SceneNode* LoadMesh(IRenderer* renderer, std::string path, bool setDefaultMaterial = true);
 private:
-	static SceneNode* processNode(Renderer* renderer, aiNode* aNode, const aiScene* aScene, std::string directory, bool setDefaultMaterial);
+	static SceneNode* processNode(IRenderer* renderer, aiNode* aNode, const aiScene* aScene, std::string directory, bool setDefaultMaterial);
 	static Mesh* parseMesh(aiMesh* aMesh, const aiScene* aScene, glm::vec3& out_Min, glm::vec3& out_Max);
-	static Material* parseMaterial(Renderer* renderer, aiMaterial* aMaterial, const aiScene* aScene, std::string directory);
+	static Material* parseMaterial(IRenderer* renderer, aiMaterial* aMaterial, const aiScene* aScene, std::string directory);
 
 	static std::string processPath(aiString* path, std::string directory);
 };

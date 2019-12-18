@@ -16,11 +16,11 @@ class FlyCamera
 public:
 	FlyCamera(glm::vec3 position, glm::vec3 forward = glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
 
-	virtual void Update(float deltaTime);
+	void Update(float deltaTime);
 
-	virtual void InputKey(float deltaTime, glm::vec3 moveInput, bool boostSpeed);
-	virtual void InputMouse(float deltaX, float deltaY);
-	virtual void InputScroll(float deltaX);
+	void HandleMove(float deltaTime, glm::vec3 moveInput, bool boostSpeed);
+	void HandleMouse(float deltaX, float deltaY);
+	void HandleScroll(float deltaX);
 
 private:
 	float m_yaw;

@@ -23,12 +23,12 @@ void FlyCamera::Update(float deltaTime)
 {
 	Camera::Update(deltaTime);
 
-	m_position = glm::lerp(m_position, m_targetPosition, glm::clamp(deltaTime * m_damping, 0.0f, 1.0f));
-	m_yaw = glm::lerp(m_yaw, m_targetYaw, glm::clamp(deltaTime * m_damping * 2.0f, 0.0f, 1.0f));
-	m_pitch = glm::lerp(m_pitch, m_targetPitch, glm::clamp(deltaTime * m_damping * 2.0f, 0.0f, 1.0f));
+	const float dampingFactor = m_damping * deltaTime;
+	m_position = glm::lerp(m_position, m_targetPosition, glm::clamp(dampingFactor, 0.0f, 1.0f));
+	m_yaw = glm::lerp(m_yaw, m_targetYaw, glm::clamp(dampingFactor * 2.0f, 0.0f, 1.0f));
+	m_pitch = glm::lerp(m_pitch, m_targetPitch, glm::clamp(dampingFactor * 2.0f, 0.0f, 1.0f));
 
-	// calculate new cartesian basis vectors from yaw/pitch pair:
-	constexpr float radian = glm::radians(1.0f);
+	static constexpr float radian = glm::radians(1.0f);
 	glm::vec3 forward(
 		cos(radian * m_pitch) * cos(radian * m_yaw),
 		sin(radian * m_pitch),
@@ -42,16 +42,17 @@ void FlyCamera::Update(float deltaTime)
 	UpdateView();
 }
 
-void FlyCamera::InputKey(float deltaTime, glm::vec3 moveInput, bool boostSpeed)
+void FlyCamera::HandleMove(float deltaTime, glm::vec3 moveInput, bool boostSpeed)
 {
 	const float velocity = m_speed * (boostSpeed ? m_boostSpeedFactor : 1.0f) * deltaTime;
-
-	glm::vec3 movement = m_right * moveInput.x + m_worldUp * moveInput.y + m_forward * moveInput.z;
+	const glm::vec3 movement = m_right * moveInput.x 
+		+ m_worldUp * moveInput.y 
+		+ m_forward * moveInput.z;
 
 	m_targetPosition = m_targetPosition + movement * velocity;
 }
 
-void FlyCamera::InputMouse(float deltaX, float deltaY)
+void FlyCamera::HandleMouse(float deltaX, float deltaY)
 {
 	m_targetYaw += deltaX * m_mouseSensitivity;
 	m_targetPitch += deltaY * m_mouseSensitivity;
@@ -70,7 +71,7 @@ void FlyCamera::InputMouse(float deltaX, float deltaY)
 	}
 }
 
-void FlyCamera::InputScroll(float delta)
+void FlyCamera::HandleScroll(float delta)
 {
 	m_properties.m_fov += delta;
 	if (m_properties.m_fov < s_minFov)

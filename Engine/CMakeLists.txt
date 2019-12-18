@@ -42,8 +42,9 @@ add_library(
 
 	Renderer/CommandBuffer.cpp
 	Renderer/CommandBuffer.h
-	Renderer/GLState.cpp
-	Renderer/GLState.h
+	Renderer/GLStateCache.cpp
+	Renderer/GLStateCache.h
+	Renderer/IRenderer.h
 	Renderer/MaterialLibrary.cpp
 	Renderer/MaterialLibrary.h
 	Renderer/PBR.cpp

@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <stack>
 
-class GLState
+class GLStateCache
 {
 public:
 	void SetDepthTest(bool enable);

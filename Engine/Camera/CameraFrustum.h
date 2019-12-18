@@ -5,17 +5,10 @@
 
 class Camera;
 
-/*
-
-  Data container for the 3D plane equation variables in Cartesian space. A plane equation can be
-  defined by its Normal (perpendicular to the plane) and a distance value D obtained from any
-  point on the plane itself (projected onto the normal vector).
-
-*/
 struct FrustumPlane
 {
 	glm::vec3 Normal;
-	float      D;
+	float D;
 
 	void SetNormalD(glm::vec3 normal, glm::vec3 point)
 	{
@@ -29,17 +22,6 @@ struct FrustumPlane
 	}
 };
 
-
-/*
-
-  Container object managing all 6 camera frustum planes as calculated from any Camera object.
-
-  The CameraFrustum allows to quickly determine (using simple collision primitives like point,
-  sphere, box) whether an object is within the frustum (or crossing the frustum's edge(s)).
-  This gives us the option to significantly reduce draw calls for objects that aren't visible
-  anyways. Note that the frustum needs to be re-calculated every frame.
-
-*/
 class CameraFrustum
 {
 public:

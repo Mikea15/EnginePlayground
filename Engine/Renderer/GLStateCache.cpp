@@ -1,7 +1,7 @@
-#include "GLState.h"
+#include "GLStateCache.h"
 
 
-void GLState::SetDepthTest(bool enable)
+void GLStateCache::SetDepthTest(bool enable)
 {
 	if (m_depthTest != enable)
 	{
@@ -11,7 +11,7 @@ void GLState::SetDepthTest(bool enable)
 
 }
 
-void GLState::SetDepthFunc(GLenum depthFunc)
+void GLStateCache::SetDepthFunc(GLenum depthFunc)
 {
 	if (m_depthFunc != depthFunc)
 	{
@@ -20,7 +20,7 @@ void GLState::SetDepthFunc(GLenum depthFunc)
 	}
 }
 
-void GLState::SetBlend(bool enable)
+void GLStateCache::SetBlend(bool enable)
 {
 	if (m_blend != enable)
 	{
@@ -29,7 +29,7 @@ void GLState::SetBlend(bool enable)
 	}
 }
 
-void GLState::SetBlendFunc(GLenum src, GLenum dst)
+void GLStateCache::SetBlendFunc(GLenum src, GLenum dst)
 {
 	if (m_blendSrc != src || m_blendDst != dst)
 	{
@@ -39,7 +39,7 @@ void GLState::SetBlendFunc(GLenum src, GLenum dst)
 	}
 }
 
-void GLState::SetCull(bool enable)
+void GLStateCache::SetCull(bool enable)
 {
 	if (m_cullFace != enable)
 	{
@@ -48,7 +48,7 @@ void GLState::SetCull(bool enable)
 	}
 }
 
-void GLState::SetCullFace(GLenum face)
+void GLStateCache::SetCullFace(GLenum face)
 {
 	if (m_frontFace != face)
 	{
@@ -57,7 +57,7 @@ void GLState::SetCullFace(GLenum face)
 	}
 }
 
-void GLState::SetPolygonMode(GLenum mode)
+void GLStateCache::SetPolygonMode(GLenum mode)
 {
 	if (m_polygonMode != mode)
 	{
@@ -66,7 +66,7 @@ void GLState::SetPolygonMode(GLenum mode)
 	}
 }
 
-void GLState::SwitchShader(unsigned int ID)
+void GLStateCache::SwitchShader(unsigned int ID)
 {
 	if (m_activeShaderID != ID)
 	{
@@ -74,13 +74,13 @@ void GLState::SwitchShader(unsigned int ID)
 	}
 }
 
-void GLState::PushState(GLenum state)
+void GLStateCache::PushState(GLenum state)
 {
 	m_stateStack.push(state);
 	ToggleState(state, true);
 }
 
-void GLState::PopState()
+void GLStateCache::PopState()
 {
 	GLenum state = m_stateStack.top();
 	m_stateStack.pop();
@@ -88,7 +88,7 @@ void GLState::PopState()
 	ToggleState(state, false);
 }
 
-void GLState::ToggleState(GLenum state, bool enable)
+void GLStateCache::ToggleState(GLenum state, bool enable)
 {
 	if (enable)
 	{

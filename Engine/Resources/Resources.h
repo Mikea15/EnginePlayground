@@ -11,7 +11,7 @@
 
 
 class SceneNode;
-class Renderer;
+class IRenderer;
 
 /*
 
@@ -47,7 +47,7 @@ public:
 	static Texture* GetTexture(std::string name);
 	static TextureCube* GetTextureCube(std::string name);
 	// mesh/scene resources
-	static SceneNode* LoadMesh(Renderer* renderer, std::string name, std::string path);
+	static SceneNode* LoadMesh(IRenderer* renderer, std::string name, std::string path);
 	static SceneNode* GetMesh(std::string name);
 };
 

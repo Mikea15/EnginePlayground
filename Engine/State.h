@@ -137,10 +137,10 @@ public:
 		// Material* customPostProcessing2 = renderer->CreatePostProcessingMaterial(postProcessing2);
 
 		// mesh 
-		// sponza = Resources::LoadMesh(renderer, "sponza", "meshes/sponza/sponza.obj");
-		// sponza->SetPosition(glm::vec3(0.0, -1.0, 0.0));
-		// sponza->SetScale(0.01f);
-
+		sponza = Resources::LoadMesh(renderer, "sponza", "meshes/sponza/sponza.obj");
+		sponza->Material = defaultForwardMat;
+		sponza->SetPosition(glm::vec3(0.0, -1.0, 0.0));
+		sponza->SetScale(0.01f);
 	};
 
 	void HandleInput(SDL_Event* event) override 
@@ -174,12 +174,12 @@ public:
 		if (m_inputGrabMouse) {
 			int x, y;
 			SDL_GetRelativeMouseState(&x, &y);
-			m_camera.InputMouse(x, -y);
+			m_camera.HandleMouse(x, -y);
 		}
 
 		// get camera movement input
 		glm::vec3 inputDir(m_inputMoveRight, m_inputMoveUp, m_inputMoveForward);
-		m_camera.InputKey(deltaTime, inputDir, m_inputEnableMovementBoost);
+		m_camera.HandleMove(deltaTime, inputDir, m_inputEnableMovementBoost);
 
 		m_camera.Update(deltaTime);
 
@@ -190,15 +190,15 @@ public:
 
 	void Render(float alpha = 1.0f) override 
 	{
-		renderer->PushRender(planeNode);
-		renderer->PushRender(mainTorus);
-		// renderer->PushRender(sponza);
-		renderer->PushRender(plasmaOrb);
+		//renderer->PushRender(planeNode);
+		//renderer->PushRender(mainTorus);
+		renderer->PushRender(sponza);
+		//renderer->PushRender(plasmaOrb);
 		// renderer->PushRender(background);
 
 		for (SceneNode* node : m_randomNodes)
 		{
-			renderer->PushRender(node);
+			//renderer->PushRender(node);
 		}
 
 		renderer->RenderPushedCommands();

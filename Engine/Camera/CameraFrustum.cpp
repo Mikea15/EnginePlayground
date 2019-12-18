@@ -3,7 +3,7 @@
 #include "Camera.h"
 
 
-// ------------------------------------------------------------------------
+
 void CameraFrustum::Update(Camera* camera)
 {
 	float tan = 2.0 * std::tan(camera->GetFov() * 0.5);
@@ -33,7 +33,7 @@ void CameraFrustum::Update(Camera* camera)
 	// far plane
 	Far.SetNormalD(-camera->GetForward(), farCenter);
 }
-// ------------------------------------------------------------------------
+
 bool CameraFrustum::Intersect(glm::vec3 point)
 {
 	for (int i = 0; i < 6; ++i)
@@ -45,7 +45,7 @@ bool CameraFrustum::Intersect(glm::vec3 point)
 	}
 	return true;
 }
-// ------------------------------------------------------------------------
+
 bool CameraFrustum::Intersect(glm::vec3 point, float radius)
 {
 	for (int i = 0; i < 6; ++i)
@@ -57,7 +57,7 @@ bool CameraFrustum::Intersect(glm::vec3 point, float radius)
 	}
 	return true;
 }
-// ------------------------------------------------------------------------
+
 bool CameraFrustum::Intersect(glm::vec3 boxMin, glm::vec3 boxMax)
 {
 	for (int i = 0; i < 6; ++i)

@@ -34,7 +34,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 forward, glm::vec3 up)
 	UpdateView();
 }
 
-void Camera::Update(float dt)
+void Camera::Update(float deltaTime)
 {
 	m_frustum.Update(this);
 }

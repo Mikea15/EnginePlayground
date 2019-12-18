@@ -2,7 +2,7 @@
 
 #include "Resources.h"
 
-#include "Renderer/Renderer.h"
+#include "Renderer/IRenderer.h"
 #include "Mesh/Mesh.h" 
 #include "Shading/Material.h"
 #include "Scene/SceneNode.h"
@@ -25,7 +25,7 @@ void MeshLoader::Clean()
 	}
 }
 
-SceneNode* MeshLoader::LoadMesh(Renderer* renderer, std::string path, bool setDefaultMaterial)
+SceneNode* MeshLoader::LoadMesh(IRenderer* renderer, std::string path, bool setDefaultMaterial)
 {
 	LOG("Loading mesh file at: %s", path.c_str());
 
@@ -45,7 +45,7 @@ SceneNode* MeshLoader::LoadMesh(Renderer* renderer, std::string path, bool setDe
 	return MeshLoader::processNode(renderer, scene->mRootNode, scene, directory, setDefaultMaterial);
 }
 
-SceneNode* MeshLoader::processNode(Renderer* renderer, aiNode* aNode, const aiScene* aScene, std::string directory, bool setDefaultMaterial)
+SceneNode* MeshLoader::processNode(IRenderer* renderer, aiNode* aNode, const aiScene* aScene, std::string directory, bool setDefaultMaterial)
 {
 	// note that we allocate memory ourselves and pass memory responsibility to calling 
 	// resource manager. The resource manager is responsible for holding the scene node 
@@ -175,7 +175,7 @@ Mesh* MeshLoader::parseMesh(aiMesh* aMesh, const aiScene* aScene, glm::vec3& out
 	return mesh;
 }
 
-Material* MeshLoader::parseMaterial(Renderer* renderer, aiMaterial* aMaterial, const aiScene* aScene, std::string directory)
+Material* MeshLoader::parseMaterial(IRenderer* renderer, aiMaterial* aMaterial, const aiScene* aScene, std::string directory)
 {
 	// create a unique default material for each loaded mesh
 	Material* material;

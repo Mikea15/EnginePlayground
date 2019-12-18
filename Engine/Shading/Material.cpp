@@ -109,48 +109,48 @@ void Material::SetTextureCube(std::string name, TextureCube* value, unsigned int
 		m_Shader->SetInt(name, unit);
 	}
 }
-// ------------------------------------------------------------------------
+
 void Material::SetVector(std::string name, glm::vec2 value)
 {
 	m_Uniforms[name].Type = SHADER_TYPE_VEC2;
 	m_Uniforms[name].Vec2 = value;
 }
-// ------------------------------------------------------------------------
+
 void Material::SetVector(std::string name, glm::vec3 value)
 {
 	m_Uniforms[name].Type = SHADER_TYPE_VEC3;
 	m_Uniforms[name].Vec3 = value;
 }
-// ------------------------------------------------------------------------
+
 void Material::SetVector(std::string name, glm::vec4 value)
 {
 	m_Uniforms[name].Type = SHADER_TYPE_VEC4;
 	m_Uniforms[name].Vec4 = value;
 }
-// ------------------------------------------------------------------------
+
 void Material::SetMatrix(std::string name, glm::mat2 value)
 {
 	m_Uniforms[name].Type = SHADER_TYPE_MAT2;
 	m_Uniforms[name].Mat2 = value;
 }
-// ------------------------------------------------------------------------
+
 void Material::SetMatrix(std::string name, glm::mat3 value)
 {
 	m_Uniforms[name].Type = SHADER_TYPE_MAT3;
 	m_Uniforms[name].Mat3 = value;
 }
-// ------------------------------------------------------------------------
+
 void Material::SetMatrix(std::string name, glm::mat4 value)
 {
 	m_Uniforms[name].Type = SHADER_TYPE_MAT4;
 	m_Uniforms[name].Mat4 = value;
 }
-// ------------------------------------------------------------------------
+
 std::map<std::string, UniformValue>* Material::GetUniforms()
 {
 	return &m_Uniforms;
 }
-// ------------------------------------------------------------------------
+
 std::map<std::string, UniformValueSampler>* Material::GetSamplerUniforms()
 {
 	return &m_SamplerUniforms;

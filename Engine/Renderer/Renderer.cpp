@@ -24,12 +24,12 @@
 #include <stack>
 
 
-// ------------------------------------------------------------------------
+
 Renderer::Renderer()
 {
 
 }
-// ------------------------------------------------------------------------
+
 Renderer::~Renderer()
 {
 	delete m_CommandBuffer;
@@ -57,7 +57,7 @@ Renderer::~Renderer()
 	// pbr
 	delete m_PBR;
 }
-// ------------------------------------------------------------------------
+
 void Renderer::Init(/*GLADloadproc loadProcFunc*/)
 {
 	// initialize render items
@@ -119,7 +119,7 @@ void Renderer::Init(/*GLADloadproc loadProcFunc*/)
 	SetSkyCapture(envBridge);
 #endif
 }
-// ------------------------------------------------------------------------
+
 void Renderer::SetRenderSize(unsigned int width, unsigned int height)
 {
 	m_RenderSize.x = width;
@@ -132,12 +132,12 @@ void Renderer::SetRenderSize(unsigned int width, unsigned int height)
 
 	m_PostProcessor->UpdateRenderSize(width, height);
 }
-// ------------------------------------------------------------------------
+
 glm::vec2 Renderer::GetRenderSize()
 {
 	return m_RenderSize;
 }
-// ------------------------------------------------------------------------
+
 void Renderer::SetTarget(RenderTarget* renderTarget, GLenum target)
 {
 	m_CurrentRenderTargetCustom = renderTarget;
@@ -150,37 +150,37 @@ void Renderer::SetTarget(RenderTarget* renderTarget, GLenum target)
 		}
 	}
 }
-// ------------------------------------------------------------------------
+
 Camera* Renderer::GetCamera()
 {
 	return m_Camera;
 }
-// ------------------------------------------------------------------------
+
 void Renderer::SetCamera(Camera* camera)
 {
 	m_Camera = camera;
 }
-// ------------------------------------------------------------------------
+
 PostProcessor* Renderer::GetPostProcessor()
 {
 	return m_PostProcessor;
 }
-// ------------------------------------------------------------------------
+
 Material* Renderer::CreateMaterial(std::string base)
 {
 	return m_MaterialLibrary->CreateMaterial(base);
 }
-// ------------------------------------------------------------------------
+
 Material* Renderer::CreateCustomMaterial(Shader* shader)
 {
 	return m_MaterialLibrary->CreateCustomMaterial(shader);
 }
-// ------------------------------------------------------------------------
+
 Material* Renderer::CreatePostProcessingMaterial(Shader* shader)
 {
 	return m_MaterialLibrary->CreatePostProcessingMaterial(shader);
 }
-// ------------------------------------------------------------------------
+
 void Renderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transform, glm::mat4 prevFrameTransform)
 {
 	// get current render target
@@ -188,7 +188,7 @@ void Renderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transform, g
 	// don't render right away but push to the command buffer for later rendering.
 	m_CommandBuffer->Push(mesh, material, transform, prevFrameTransform, glm::vec3(-99999.0f), glm::vec3(99999.0f), target);
 }
-// ------------------------------------------------------------------------
+
 void Renderer::PushRender(SceneNode* node)
 {
 	// update transform(s) before pushing node to render command buffer
@@ -217,23 +217,23 @@ void Renderer::PushRender(SceneNode* node)
 			nodeStack.push(node->GetChildByIndex(i));
 	}
 }
-// ------------------------------------------------------------------------
+
 void Renderer::PushPostProcessor(Material* postProcessor)
 {
 	// we only care about the material, mesh as NDC quad is pre-defined.
 	m_CommandBuffer->Push(nullptr, postProcessor);
 }
-// ------------------------------------------------------------------------
+
 void Renderer::AddLight(DirectionalLight* light)
 {
 	m_DirectionalLights.push_back(light);
 }
-// ------------------------------------------------------------------------
+
 void Renderer::AddLight(PointLight* light)
 {
 	m_PointLights.push_back(light);
 }
-// ------------------------------------------------------------------------
+
 void Renderer::RenderPushedCommands()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -503,7 +503,7 @@ void Renderer::RenderPushedCommands()
 	m_CurrentRenderTargetCustom = nullptr;
 #endif 
 }
-// ------------------------------------------------------------------------
+
 void Renderer::Blit(Texture* src,
 	RenderTarget* dst,
 	Material* material,
@@ -542,22 +542,22 @@ void Renderer::Blit(Texture* src,
 	command.Mesh = m_NDCPlane;
 	renderCustomCommand(&command, nullptr);
 }
-// ------------------------------------------------------------------------
+
 void Renderer::SetSkyCapture(PBRCapture* pbrEnvironment)
 {
 	m_PBR->SetSkyCapture(pbrEnvironment);
 }
-// ------------------------------------------------------------------------
+
 PBRCapture* Renderer::GetSkypCature()
 {
 	return m_PBR->GetSkyCapture();
 }
-// ------------------------------------------------------------------------
+
 void Renderer::AddIrradianceProbe(glm::vec3 position, float radius)
 {
 	m_ProbeSpatials.push_back(glm::vec4(position, radius));
 }
-// ------------------------------------------------------------------------
+
 void Renderer::BakeProbes(SceneNode* scene)
 {
 	if (!scene)
@@ -629,7 +629,7 @@ void Renderer::BakeProbes(SceneNode* scene)
 		delete materials[i];
 	}
 }
-// ------------------------------------------------------------------------
+
 void Renderer::renderCustomCommand(RenderCommand* command, Camera* customCamera, bool updateGLSettings)
 {
 	Material* material = command->Material;
@@ -725,7 +725,7 @@ void Renderer::renderCustomCommand(RenderCommand* command, Camera* customCamera,
 
 	renderMesh(mesh, material->GetShader());
 }
-// ------------------------------------------------------------------------
+
 void Renderer::renderToCubemap(SceneNode* scene,
 	TextureCube* target,
 	glm::vec3   position,
@@ -752,7 +752,7 @@ void Renderer::renderToCubemap(SceneNode* scene,
 
 	renderToCubemap(renderCommands, target, position, mipLevel);
 }
-// ------------------------------------------------------------------------
+
 void Renderer::renderToCubemap(std::vector<RenderCommand>& renderCommands, TextureCube* target, glm::vec3 position, unsigned int mipLevel)
 {
 	// define 6 camera directions/lookup vectors

@@ -15,7 +15,7 @@ union SDL_Event;
 #include "Mesh/Torus.h"
 #include "Mesh/Cube.h"
 
-#include "Utils/Utils.h"
+#include "Utils/MathUtils.h"
 
 
 #include <stack>
@@ -111,11 +111,11 @@ public:
 				{
 					glm::vec3 position = glm::vec3(0.0f, 0.5f, 0.0f) + glm::vec3(x - 5, y, z - 5) * spacing;
 
-					float rand = Utils::Rand01();
+					float rand = MathUtils::Rand01();
 					SceneNode* node = Scene::MakeSceneNode(tSphere, rand < 0.5f ? defaultForwardMat : defaultForwardMatAlpha);
 					node->SetPosition(position);
 
-					const float randomScale = Utils::Rand(0.5f, 2.3f);
+					const float randomScale = MathUtils::Rand(0.5f, 2.3f);
 					node->SetScale(randomScale);
 
 					m_randomNodes.push_back(node);

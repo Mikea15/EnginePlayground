@@ -97,8 +97,6 @@ protected:
 
 	Properties m_properties;
 
-	bool m_isDirty;
-
 	static const float s_minFov;
 	static const float s_maxFov;
 	static const float s_maxPitchAngle;

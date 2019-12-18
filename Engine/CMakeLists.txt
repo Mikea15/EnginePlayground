@@ -97,6 +97,7 @@ add_library(
 
 	Utils/FileIO.h
 	Utils/Logger.h
+	Utils/MathUtils.h
 	Utils/Utils.h
 
 	Window/IMGUIHandler.cpp

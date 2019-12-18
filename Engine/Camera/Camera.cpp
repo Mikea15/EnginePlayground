@@ -19,7 +19,6 @@ Camera::Camera()
 	, m_forward(0.0f, 0.0f, -1.0f)
 	, m_up(0.0f, 1.0f, 0.0f)
 	, m_right(1.0f, 0.0f, 0.0f)
-	, m_isDirty(true)
 {
 	UpdateView();
 }
@@ -31,7 +30,6 @@ Camera::Camera(glm::vec3 position, glm::vec3 forward, glm::vec3 up)
 	, m_forward(forward)
 	, m_up(up)
 	, m_right(1.0f, 0.0f, 0.0f)
-	, m_isDirty(true)
 {
 	UpdateView();
 }
@@ -45,6 +43,7 @@ void Camera::Update(float deltaTime)
 void Camera::SetPerspective(float fov, float aspect, float near, float far)
 {
 	m_properties.m_isPerspective = true;
+
 	m_properties.m_fov = fov;
 	m_properties.m_aspectRatio = aspect;
 	m_properties.m_nearPlane = near;
@@ -69,11 +68,7 @@ void Camera::SetOrthographic(float left, float right, float top, float bottom, f
 
 void Camera::UpdateView()
 {
-	if (m_isDirty)
-	{
-		m_view = glm::lookAt(m_position, m_position + m_forward, m_up);
-		m_isDirty = false;
-	}
+	m_view = glm::lookAt(m_position, m_position + m_forward, m_up);
 }
 
 float Camera::FrustumHeightAtDistance(float distance)
@@ -97,7 +92,6 @@ float Camera::DistanceAtFrustumHeight(float frustumHeight)
 void Camera::SetPosition(const glm::vec3& position)
 {
 	m_position = position;
-	m_isDirty = true;
 }
 
 void Camera::SetProperties(const Properties& properties)

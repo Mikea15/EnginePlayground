@@ -4,21 +4,16 @@
 
 class RenderTarget;
 
-/*
-  Light container object for any 3D directional light source. Directional light types support
-  shadow casting, holding a reference to the RenderTarget (and the relevant light space view
-  projection matrix) used for its shadow map generation.
-*/
 class DirectionalLight
 {
 public:
-	glm::vec3 Direction = glm::vec3(0.0f);
-	glm::vec3 Color = glm::vec3(1.0f);
-	float Intensity = 1.0f;
+	glm::vec3 m_direction = glm::vec3(0.0f);
+	glm::vec3 m_color = glm::vec3(1.0f);
+	float m_intensity = 1.0f;
 
-	bool CastShadows = true;
-	RenderTarget* ShadowMapRT;
-	glm::mat4 LightSpaceViewProjection;
+	bool m_castShadows = true;
+	RenderTarget* m_shadowMatRenderTarget;
+	glm::mat4 m_lightSpaceViewPrrojection;
 };
 
 

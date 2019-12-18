@@ -14,187 +14,206 @@
 
 #include "Utils/Logger.h"
 
-std::map<unsigned int, Shader>      Resources::m_Shaders = std::map<unsigned int, Shader>();
-std::map<unsigned int, Texture>     Resources::m_Textures = std::map<unsigned int, Texture>();
-std::map<unsigned int, TextureCube> Resources::m_TexturesCube = std::map<unsigned int, TextureCube>();
-std::map<unsigned int, SceneNode*>  Resources::m_Meshes = std::map<unsigned int, SceneNode*>();
+const std::string Resources::s_mainAssetDirectory = "../../../../data/";
+const std::string Resources::s_assetShaderDir = "Shaders/";
+const std::string Resources::s_assetModelDir = "Objects/";
+const std::string Resources::s_assetImagesDir = "Images/";
+
+std::map<unsigned int, Shader>      Resources::m_shaders = std::map<unsigned int, Shader>();
+std::map<unsigned int, Texture>     Resources::m_textures = std::map<unsigned int, Texture>();
+std::map<unsigned int, TextureCube> Resources::m_texturesCube = std::map<unsigned int, TextureCube>();
+std::map<unsigned int, SceneNode*>  Resources::m_meshes = std::map<unsigned int, SceneNode*>();
 
 void Resources::Init()
 {
-	// initialize default assets/resources that should  always be available, regardless of 
-	// configuration.        
 	Texture placeholderTexture;
 }
+
 void Resources::Clean()
 {
-	// traverse all stored mesh scene nodes and delete accordingly.
-	// Note that this time we don't care about deleting dangling pointers as each scene node is
-	// unique and shouldn't reference other scene nodes than their children.
-	for (auto it = m_Meshes.begin(); it != m_Meshes.end(); it++)
+	for (auto it = m_meshes.begin(); it != m_meshes.end(); it++)
 	{
 		delete it->second;
 	}
 }
 
-Shader* Resources::LoadShader(std::string name, std::string vsPath, std::string fsPath, std::vector<std::string> defines)
+Shader* Resources::LoadShader(const std::string& name, const std::string& vsPath, const std::string& fsPath, std::vector<std::string> defines)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if shader already exists, return that handle
-	if (Resources::m_Shaders.find(id) != Resources::m_Shaders.end())
-		return &Resources::m_Shaders[id];
+	auto it = m_shaders.find(id);
+	if (it != m_shaders.end())
+	{
+		return &it->second;
+	}
 
-	Shader shader = ShaderLoader::Load(name, "../../../../data/" + vsPath, "../../../../data/" + fsPath, defines);
-	Resources::m_Shaders[id] = shader;
-	return &Resources::m_Shaders[id];
+	Shader shader = ShaderLoader::Load(name,
+		s_mainAssetDirectory + vsPath,
+		s_mainAssetDirectory + fsPath, defines);
+
+	auto result = m_shaders.emplace(id, shader);
+	if (result.second)
+	{
+		return &result.first->second;
+	}
+
+	LOG_ERROR("Could not load shader: %s", name.c_str());
+	// return error shader
+	return nullptr;
 }
 
-Shader* Resources::GetShader(std::string name)
+Shader* Resources::GetShader(const std::string& name)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if shader exists, return that handle
-	if (Resources::m_Shaders.find(id) != Resources::m_Shaders.end())
+	auto it = m_shaders.find(id);
+	if (it != m_shaders.end())
 	{
-		return &Resources::m_Shaders[id];
+		return &it->second;
 	}
-	else
-	{
-		LOG_ERROR("Requested shader: %s not found!", name.c_str());
-		return nullptr;
-	}
+
+	LOG_ERROR("Requested shader: %s not found!", name.c_str());
+	// return error shader
+	return nullptr;
 }
 
-Texture* Resources::LoadTexture(std::string name, std::string path, GLenum target, GLenum format, bool srgb)
+Texture* Resources::LoadTexture(const std::string& name, const std::string& path, GLenum target, GLenum format, bool srgb, bool fullpath)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if texture already exists, return that handle
-	if (Resources::m_Textures.find(id) != Resources::m_Textures.end())
-		return &Resources::m_Textures[id];
+	auto it = m_textures.find(id);
+	if (it != m_textures.end())
+	{
+		return &it->second;
+	}
 
 	LOG("Loading texture file at: %s", path.c_str());
 
-	Texture texture = TextureLoader::LoadTexture("../../../../data/" + path, target, format, srgb);
+	std::string finalPath = fullpath ? path : "../../../../data/" + path;
+	Texture texture = TextureLoader::LoadTexture(finalPath, target, format, srgb);
 
 	LOG("Succesfully loaded: %s", path.c_str());
 
-	// make sure texture got properly loaded
 	if (texture.Width > 0)
 	{
-		Resources::m_Textures[id] = texture;
-		return &Resources::m_Textures[id];
+		m_textures[id] = texture;
+		return &m_textures[id];
 	}
-	else
-	{
-		return nullptr;
-	}
+
+	return nullptr;
 }
 
-Texture* Resources::LoadHDR(std::string name, std::string path)
+Texture* Resources::LoadHDR(const std::string& name, const std::string& path)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if texture already exists, return that handle
-	if (Resources::m_Textures.find(id) != Resources::m_Textures.end())
-		return &Resources::m_Textures[id];
+	auto it = m_textures.find(id);
+	if (it != m_textures.end())
+	{
+		return &it->second;
+	}
 
-	Texture texture = TextureLoader::LoadHDRTexture("../../../../data/" + path);
-	// make sure texture got properly loaded
+	LOG("Loading texture file at: %s", path.c_str());
+
+	Texture texture = TextureLoader::LoadHDRTexture(s_mainAssetDirectory + path);
+
+	LOG("Succesfully loaded: %s", path.c_str());
+
 	if (texture.Width > 0)
 	{
-		Resources::m_Textures[id] = texture;
-		return &Resources::m_Textures[id];
+		m_textures[id] = texture;
+		return &m_textures[id];
 	}
-	else
-	{
-		return nullptr;
-	}
+
+	return nullptr;
 }
 
-Texture* Resources::GetTexture(std::string name)
+Texture* Resources::GetTexture(const std::string& name)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if shader exists, return that handle
-	if (Resources::m_Textures.find(id) != Resources::m_Textures.end())
+	auto it = m_textures.find(id);
+	if (it != m_textures.end())
 	{
-		return &Resources::m_Textures[id];
+		return &it->second;
 	}
-	else
-	{
-		LOG("Requested texture: %s not found", name.c_str());
-		return nullptr;
-	}
+
+	LOG("Requested texture: %s not found", name.c_str());
+
+	// return invalid texture
+	return nullptr;
 }
 
-TextureCube* Resources::LoadTextureCube(std::string name, std::string folder)
+TextureCube* Resources::LoadTextureCube(const std::string& name, const std::string& folder)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if texture already exists, return that handle
-	if (Resources::m_TexturesCube.find(id) != Resources::m_TexturesCube.end())
-		return &Resources::m_TexturesCube[id];
+	if (TextureCube* texture = GetTextureCube(name))
+	{
+		return texture;
+	}
 
-	TextureCube texture = TextureLoader::LoadTextureCube("../../../../data/" + folder);
-	Resources::m_TexturesCube[id] = texture;
-	return &Resources::m_TexturesCube[id];
+	TextureCube texture = TextureLoader::LoadTextureCube(s_mainAssetDirectory + folder);
+
+	auto result = m_texturesCube.emplace(id, texture);
+	if (result.second)
+	{
+		return &result.first->second;
+	}
+
+	// return invalid texture
+	return nullptr;
 }
 
-TextureCube* Resources::GetTextureCube(std::string name)
+TextureCube* Resources::GetTextureCube(const std::string& name)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if shader exists, return that handle
-	if (Resources::m_TexturesCube.find(id) != Resources::m_TexturesCube.end())
+	auto it = m_texturesCube.find(id);
+	if (it != m_texturesCube.end())
 	{
-		return &Resources::m_TexturesCube[id];
+		return &it->second;
 	}
-	else
-	{
-		LOG("Requested texture cube: %s not found!", name.c_str());
-		return nullptr;
-	}
+
+	LOG("Requested texture cube: %s not found!", name.c_str());
+	
+	// return invalid texture
+	return nullptr;
 }
 
-SceneNode* Resources::LoadMesh(IRenderer* renderer, std::string name, std::string path)
+SceneNode* Resources::LoadMesh(IRenderer* renderer, const std::string& name, const std::string& path)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if mesh's scene node was already loaded before, copy the scene node's memory and return 
-	// the copied reference. We return a copy as the moment the global scene deletes the 
-	// returned node, all other and next requested scene nodes of this model will end up as
-	// dangling pointers.
-	if (Resources::m_Meshes.find(id) != Resources::m_Meshes.end())
+	auto it = m_meshes.find(id);
+	if (it != m_meshes.end())
 	{
-		return Scene::MakeSceneNode(Resources::m_Meshes[id]);
+		// Return copy of pointer.
+		return Scene::MakeSceneNode(it->second);
+	}
+	
+	SceneNode* node = MeshLoader::LoadMesh(renderer, s_mainAssetDirectory + path);
+	auto result = m_meshes.emplace(id, node);
+	if (result.second)
+	{
+		// Return copy of pointer.
+		return Scene::MakeSceneNode(result.first->second);
 	}
 
-	// MeshLoader::LoadMesh initializes a scene node hierarchy on the heap. We are responsible 
-	// for managing the memory; keep a reference to the root node of the model scene. 
-	SceneNode* node = MeshLoader::LoadMesh(renderer, "../../../../data/" + path);
-	Resources::m_Meshes[id] = node;
-
-	// return a copied reference through the scene to prevent dangling pointers. 
-	// See description above.
-	return Scene::MakeSceneNode(node);
+	return nullptr;
 }
 
-SceneNode* Resources::GetMesh(std::string name)
+SceneNode* Resources::GetMesh(const std::string& name)
 {
 	unsigned int id = Utils::Hash(name);
 
-	// if mesh's scene node was already loaded before, copy the scene node's memory and return 
-	// the copied reference. We return a copy as the moment the global scene deletes the 
-	// returned node, all other and next requested scene nodes of this model will end up as
-	// dangling pointers.
-	if (Resources::m_Meshes.find(id) != Resources::m_Meshes.end())
+	auto it = m_meshes.find(id);
+	if (it != m_meshes.end())
 	{
-		return Scene::MakeSceneNode(Resources::m_Meshes[id]);
+		// Return copy of pointer.
+		return Scene::MakeSceneNode(it->second);
 	}
-	else
-	{
-		LOG("Requested mesh: %s not found!", name.c_str());
-		return nullptr;
-	}
+
+	LOG("Requested mesh: %s not found!", name.c_str());
+	return nullptr;
 }

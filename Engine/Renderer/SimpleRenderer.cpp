@@ -58,7 +58,6 @@ void SimpleRenderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transf
 	RenderCommand command;
 	command.Mesh = mesh;
 	command.Material = material;
-	// command.Material = m_materialLibrary->debugLightMaterial;
 	command.Transform = transform;
 	command.PrevTransform = prevTransform;
 	command.BoxMin = glm::vec3(-10000.0f);

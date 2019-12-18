@@ -300,7 +300,7 @@ void Renderer::RenderPushedCommands()
 		for (int i = 0; i < m_DirectionalLights.size(); ++i)
 		{
 			DirectionalLight* light = m_DirectionalLights[i];
-			if (light->CastShadows)
+			if (light->m_castShadows)
 			{
 				m_MaterialLibrary->dirShadowShader->Use();
 
@@ -309,9 +309,9 @@ void Renderer::RenderPushedCommands()
 				glClear(GL_DEPTH_BUFFER_BIT);
 
 				glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, 20.0f, -20.0f, -15.0f, 20.0f);
-				glm::mat4 lightView = glm::lookAt(-light->Direction * 10.0f, glm::vec3(0.0), glm::vec3(0, 1, 0));
-				m_DirectionalLights[i]->LightSpaceViewProjection = lightProjection * lightView;
-				m_DirectionalLights[i]->ShadowMapRT = m_ShadowRenderTargets[shadowRtIndex];
+				glm::mat4 lightView = glm::lookAt(-light->m_direction * 10.0f, glm::vec3(0.0), glm::vec3(0, 1, 0));
+				m_DirectionalLights[i]->m_lightSpaceViewPrrojection = lightProjection * lightView;
+				m_DirectionalLights[i]->m_shadowMatRenderTarget = m_ShadowRenderTargets[shadowRtIndex];
 				for (int j = 0; j < shadowRenderCommands.size(); ++j)
 				{
 					renderShadowCastCommand(&shadowRenderCommands[j], lightProjection, lightView);
@@ -357,7 +357,7 @@ void Renderer::RenderPushedCommands()
 		for (auto it = m_PointLights.begin(); it != m_PointLights.end(); ++it)
 		{
 			// only render point lights if within frustum
-			if (m_Camera->GetFrustum().Intersect((*it)->Position, (*it)->Radius))
+			if (m_Camera->GetFrustum().Intersect((*it)->m_position, (*it)->m_radius))
 			{
 				renderDeferredPointLight(*it);
 			}
@@ -429,15 +429,15 @@ void Renderer::RenderPushedCommands()
 	// render light mesh (as visual cue), if requested
 	for (auto it = m_PointLights.begin(); it != m_PointLights.end(); ++it)
 	{
-		if ((*it)->RenderMesh)
+		if ((*it)->m_renderMesh)
 		{
-			m_MaterialLibrary->debugLightMaterial->SetVector("lightColor", (*it)->Color * (*it)->Intensity * 0.25f);
+			m_MaterialLibrary->debugLightMaterial->SetVector("lightColor", (*it)->m_color * (*it)->m_intensity * 0.25f);
 
 			RenderCommand command;
 			command.Material = m_MaterialLibrary->debugLightMaterial;
 			command.Mesh = m_DebugLightMesh;
 			glm::mat4 model;
-			glm::translate(model, (*it)->Position);
+			glm::translate(model, (*it)->m_position);
 			glm::scale(model, glm::vec3(0.25f));
 			command.Transform = model;
 
@@ -457,14 +457,14 @@ void Renderer::RenderPushedCommands()
 		m_GLCache.SetCullFace(GL_FRONT);
 		for (auto it = m_PointLights.begin(); it != m_PointLights.end(); ++it)
 		{
-			m_MaterialLibrary->debugLightMaterial->SetVector("lightColor", (*it)->Color);
+			m_MaterialLibrary->debugLightMaterial->SetVector("lightColor", (*it)->m_color);
 
 			RenderCommand command;
 			command.Material = m_MaterialLibrary->debugLightMaterial;
 			command.Mesh = m_DebugLightMesh;
 			glm::mat4 model;
-			glm::translate(model, (*it)->Position);
-			glm::scale(model, glm::vec3((*it)->Radius));
+			glm::translate(model, (*it)->m_position);
+			glm::scale(model, glm::vec3((*it)->m_radius));
 			command.Transform = model;
 
 			renderCustomCommand(&command, nullptr);
@@ -666,10 +666,10 @@ void Renderer::renderCustomCommand(RenderCommand* command, Camera* customCamera,
 	{
 		for (int i = 0; i < m_DirectionalLights.size(); ++i)
 		{
-			if (m_DirectionalLights[i]->ShadowMapRT)
+			if (m_DirectionalLights[i]->m_shadowMatRenderTarget)
 			{
-				material->GetShader()->SetMatrix("lightShadowViewProjection" + std::to_string(i + 1), m_DirectionalLights[i]->LightSpaceViewProjection);
-				m_DirectionalLights[i]->ShadowMapRT->GetDepthStencilTexture()->Bind(10 + i);
+				material->GetShader()->SetMatrix("lightShadowViewProjection" + std::to_string(i + 1), m_DirectionalLights[i]->m_lightSpaceViewPrrojection);
+				m_DirectionalLights[i]->m_shadowMatRenderTarget->GetDepthStencilTexture()->Bind(10 + i);
 			}
 		}
 	}
@@ -823,13 +823,13 @@ void Renderer::updateGlobalUBOs()
 	unsigned int stride = 2 * sizeof(glm::vec4);
 	for (unsigned int i = 0; i < m_DirectionalLights.size() && i < 4; ++i) // no more than 4 directional lights
 	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 336 + i * stride, sizeof(glm::vec4), &m_DirectionalLights[i]->Direction[0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 336 + i * stride + sizeof(glm::vec4), sizeof(glm::vec4), &m_DirectionalLights[i]->Color[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 336 + i * stride, sizeof(glm::vec4), &m_DirectionalLights[i]->m_direction[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 336 + i * stride + sizeof(glm::vec4), sizeof(glm::vec4), &m_DirectionalLights[i]->m_color[0]);
 	}
 	for (unsigned int i = 0; i < m_PointLights.size() && i < 8; ++i) //  constrained to max 8 point lights in forward context
 	{
-		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride, sizeof(glm::vec4), &m_PointLights[i]->Position[0]);
-		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride + sizeof(glm::vec4), sizeof(glm::vec4), &m_PointLights[i]->Color[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride, sizeof(glm::vec4), &m_PointLights[i]->m_position[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride + sizeof(glm::vec4), sizeof(glm::vec4), &m_PointLights[i]->m_color[0]);
 	}
 }
 
@@ -897,14 +897,14 @@ void Renderer::renderDeferredDirLight(DirectionalLight* light)
 
 	dirShader->Use();
 	dirShader->SetVector("camPos", m_Camera->GetPosition());
-	dirShader->SetVector("lightDir", light->Direction);
-	dirShader->SetVector("lightColor", glm::normalize(light->Color) * light->Intensity);
+	dirShader->SetVector("lightDir", light->m_direction);
+	dirShader->SetVector("lightColor", glm::normalize(light->m_color) * light->m_intensity);
 	dirShader->SetBool("ShadowsEnabled", Shadows);
 
-	if (light->ShadowMapRT)
+	if (light->m_shadowMatRenderTarget)
 	{
-		dirShader->SetMatrix("lightShadowViewProjection", light->LightSpaceViewProjection);
-		light->ShadowMapRT->GetDepthStencilTexture()->Bind(3);
+		dirShader->SetMatrix("lightShadowViewProjection", light->m_lightSpaceViewPrrojection);
+		light->m_shadowMatRenderTarget->GetDepthStencilTexture()->Bind(3);
 	}
 
 	renderMesh(m_NDCPlane, dirShader);
@@ -916,13 +916,13 @@ void Renderer::renderDeferredPointLight(PointLight* light)
 
 	pointShader->Use();
 	pointShader->SetVector("camPos", m_Camera->GetPosition());
-	pointShader->SetVector("lightPos", light->Position);
-	pointShader->SetFloat("lightRadius", light->Radius);
-	pointShader->SetVector("lightColor", glm::normalize(light->Color) * light->Intensity);
+	pointShader->SetVector("lightPos", light->m_position);
+	pointShader->SetFloat("lightRadius", light->m_radius);
+	pointShader->SetVector("lightColor", glm::normalize(light->m_color) * light->m_intensity);
 
 	glm::mat4 model;
-	glm::translate(model, light->Position);
-	glm::scale(model, glm::vec3(light->Radius));
+	glm::translate(model, light->m_position);
+	glm::scale(model, glm::vec3(light->m_radius));
 	pointShader->SetMatrix("model", model);
 
 	renderMesh(m_DeferredPointMesh, pointShader);

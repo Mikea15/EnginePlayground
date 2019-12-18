@@ -137,10 +137,10 @@ public:
 		// Material* customPostProcessing2 = renderer->CreatePostProcessingMaterial(postProcessing2);
 
 		// mesh 
-		sponza = Resources::LoadMesh(renderer, "sponza", "meshes/sponza/sponza.obj");
-		sponza->Material = defaultForwardMat;
-		sponza->SetPosition(glm::vec3(0.0, -1.0, 0.0));
-		sponza->SetScale(0.01f);
+		//sponza = Resources::LoadMesh(renderer, "sponza", "meshes/sponza/sponza.obj");
+		//sponza->Material = defaultForwardMat;
+		//sponza->SetPosition(glm::vec3(0.0, -1.0, 0.0));
+		//sponza->SetScale(0.01f);
 	};
 
 	void HandleInput(SDL_Event* event) override 
@@ -198,7 +198,7 @@ public:
 
 		for (SceneNode* node : m_randomNodes)
 		{
-			//renderer->PushRender(node);
+			// renderer->PushRender(node);
 		}
 
 		renderer->RenderPushedCommands();

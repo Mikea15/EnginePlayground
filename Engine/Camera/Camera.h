@@ -15,16 +15,27 @@ public:
 		float m_farPlane = 1000.0f;
 		bool m_isPerspective = false;
 
-		bool operator==(const Properties& rhs) {
+		float m_orthoLeft = 5.0f;
+		float m_orthoRight = 5.0f;
+		float m_orthoTop = 5.0f;
+		float m_orthoBottom = 5.0f;
+
+		bool operator==(const Properties& rhs) 
+		{
 			if (m_fov != rhs.m_fov) return false;
 			if (m_aspectRatio != rhs.m_aspectRatio) return false;
 			if (m_nearPlane != rhs.m_nearPlane) return false;
 			if (m_farPlane != rhs.m_farPlane) return false;
 			if (m_isPerspective != rhs.m_isPerspective) return false;
+			if (m_orthoLeft != rhs.m_orthoLeft) return false;
+			if (m_orthoRight != rhs.m_orthoRight) return false;
+			if (m_orthoTop != rhs.m_orthoTop) return false;
+			if (m_orthoBottom != rhs.m_orthoBottom) return false;
 			return true;
 		}
 
-		bool operator!=(const Properties& rhs) {
+		bool operator!=(const Properties& rhs) 
+		{
 			return !(*this == rhs);
 		}
 	};
@@ -43,7 +54,7 @@ public:
 	float DistanceAtFrustumHeight(float frustumHeight);
 
 	const glm::vec3& GetPosition() const { return m_position; }
-	void SetPosition(const glm::vec3& position) { m_position = position; }
+	void SetPosition(const glm::vec3& position);
 
 	const glm::mat4& GetView() const { return m_view; }
 	const glm::mat4& GetProjection() const { return m_projection; }
@@ -70,6 +81,9 @@ public:
 	float GetAspectRatio() const { return m_properties.m_aspectRatio; }
 	void SetAspectRatio(float ratio);
 
+private:
+	void UpdateProjection();
+
 protected:
 	glm::mat4 m_projection;
 	glm::mat4 m_view;
@@ -82,6 +96,8 @@ protected:
 	CameraFrustum m_frustum;
 
 	Properties m_properties;
+
+	bool m_isDirty;
 
 	static const float s_minFov;
 	static const float s_maxFov;

@@ -23,7 +23,6 @@ void main()
 {
     vec4 albedo = texture(TexAlbedo, TexCoords);
 
-#if 0
     #ifdef ALPHA_BLEND
         albedo.rgb *= albedo.a; // pre-multiplied alpha
     #endif
@@ -51,5 +50,4 @@ void main()
     #else 
         FragColor = vec4(color, 1.0);
     #endif
-#endif
 }

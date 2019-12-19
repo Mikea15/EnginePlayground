@@ -113,13 +113,12 @@ void MaterialLibrary::generateDefaultMaterials()
 	alphaDiscardMaterial->Cull = false;
 	m_DefaultMaterials[Utils::Hash("alpha discard")] = alphaDiscardMaterial;
 
-	Shader* defaultFwdShader = Resources::LoadShader("default-fwd", "shaders/textured.vs", "shaders/textured.fs");
+	Shader* defaultFwdShader = Resources::LoadShader("default-fwd", "shaders/forward_render.vs", "shaders/forward_render.fs");
 	Material* defaultForwardMat = new Material(defaultFwdShader);
 	defaultForwardMat->SetTexture("TexAlbedo", Resources::LoadTexture("default albedo", "textures/checkerboard.png", GL_TEXTURE_2D, GL_RGB), 3);
 	m_DefaultMaterials[Utils::Hash("default-fwd")] = defaultForwardMat;
 
-
-	Shader* fwdTransparentShader = Resources::LoadShader("default-fwd-alpha", "shaders/textured.vs", "shaders/textured.fs", { "ALPHA_BLEND" });
+	Shader* fwdTransparentShader = Resources::LoadShader("default-fwd-alpha", "shaders/forward_render.vs", "shaders/forward_render.fs", { "ALPHA_BLEND" });
 	Material* fwdTransparentMat = new Material(fwdTransparentShader);
 	fwdTransparentMat->SetTexture("TexAlbedo", Resources::LoadTexture("default albedo", "textures/checkerboard.png", GL_TEXTURE_2D, GL_RGB), 3);
 	fwdTransparentMat->Blend = true;

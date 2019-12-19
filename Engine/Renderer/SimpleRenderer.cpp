@@ -9,6 +9,7 @@
 #include "Shading/Shader.h"
 #include "Shading/Material.h"
 #include "MaterialLibrary.h"
+#include "RenderTarget.h"
 
 #include "Utils/Logger.h"
 
@@ -20,11 +21,35 @@
 SimpleRenderer::~SimpleRenderer()
 {
 	delete m_materialLibrary;
+	// shadows
+	for (int i = 0; i < m_ShadowRenderTargets.size(); ++i)
+	{
+		delete m_ShadowRenderTargets[i];
+	}
 }
 
 void SimpleRenderer::Init()
 {
 	m_materialLibrary = new MaterialLibrary();
+
+	// shadows
+	for (int i = 0; i < 4; ++i) // allow up to a total of 4 dir/spot shadow casters
+	{
+		RenderTarget* rt = new RenderTarget(2048, 2048, GL_UNSIGNED_BYTE, 1, true);
+		rt->m_DepthStencil.Bind();
+		rt->m_DepthStencil.SetFilterMin(GL_NEAREST);
+		rt->m_DepthStencil.SetFilterMax(GL_NEAREST);
+		rt->m_DepthStencil.SetWrapMode(GL_CLAMP_TO_BORDER);
+		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+		m_ShadowRenderTargets.push_back(rt);
+	}
+
+	// ubo
+	glGenBuffers(1, &m_GlobalUBO);
+	glBindBuffer(GL_UNIFORM_BUFFER, m_GlobalUBO);
+	glBufferData(GL_UNIFORM_BUFFER, 720, nullptr, GL_STREAM_DRAW);
+	glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_GlobalUBO);
 }
 
 void SimpleRenderer::SetCamera(Camera* camera)
@@ -101,9 +126,33 @@ void SimpleRenderer::PushRender(SceneNode* node)
 
 void SimpleRenderer::RenderPushedCommands()
 {
-	glClearColor(0.7f, 0.3f, 1.0f, 1.0f);
+	glClearColor(0.2f, 0.2f, 0.6f, 1.0f);
 	glViewport(0, 0, m_renderTargetWidth, m_renderTargetHeight);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Update Uniform Buffers.
+	glBindBuffer(GL_UNIFORM_BUFFER, m_GlobalUBO);
+	// transformation matrices
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &(m_camera->GetProjection() * m_camera->GetView())[0][0]); // sizeof(glm::mat4) = 64 bytes
+	glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(glm::mat4), &m_prevViewProjection[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 128, sizeof(glm::mat4), &m_camera->GetProjection()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 192, sizeof(glm::mat4), &m_camera->GetView()[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 256, sizeof(glm::mat4), &m_camera->GetView()[0][0]); // TODO: make inv function in math library
+	// scene data
+	glBufferSubData(GL_UNIFORM_BUFFER, 320, sizeof(glm::vec4), &m_camera->GetPosition()[0]);
+	// lighting
+	unsigned int stride = 2 * sizeof(glm::vec4);
+	for (unsigned int i = 0; i < m_DirectionalLights.size() && i < 4; ++i) // no more than 4 directional lights
+	{
+		glBufferSubData(GL_UNIFORM_BUFFER, 336 + i * stride, sizeof(glm::vec4), &m_DirectionalLights[i]->m_direction[0]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 336 + i * stride + sizeof(glm::vec4), sizeof(glm::vec4), &m_DirectionalLights[i]->m_color[0]);
+	}
+	// No PointLights to add.
+	//for (unsigned int i = 0; i < m_PointLights.size() && i < 8; ++i) //  constrained to max 8 point lights in forward context
+	//{
+	//	glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride, sizeof(glm::vec4), &m_PointLights[i]->m_position[0]);
+	//	glBufferSubData(GL_UNIFORM_BUFFER, 464 + i * stride + sizeof(glm::vec4), sizeof(glm::vec4), &m_PointLights[i]->m_color[0]);
+	//}
 
 	const glm::mat4 view = m_camera->GetView();
 	const glm::mat4 projection = m_camera->GetProjection();
@@ -122,8 +171,44 @@ void SimpleRenderer::RenderPushedCommands()
 			solids.push_back(*it);
 		}
 	}
-
 	m_renderCommands.clear();
+
+	if (m_enableShadows)
+	{
+		m_glState.SetCullFace(GL_FRONT);
+		m_ShadowViewProjections.clear();
+
+		unsigned int shadowRtIndex = 0;
+		for (int i = 0; i < m_DirectionalLights.size(); ++i)
+		{
+			DirectionalLight* light = m_DirectionalLights[i];
+			if (light->m_castShadows)
+			{
+				m_materialLibrary->dirShadowShader->Use();
+				glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowRenderTargets[shadowRtIndex]->ID);
+				glViewport(0, 0, m_ShadowRenderTargets[shadowRtIndex]->Width, m_ShadowRenderTargets[shadowRtIndex]->Height);
+				glClear(GL_DEPTH_BUFFER_BIT);
+
+				glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, 20.0f, -20.0f, -15.0f, 20.0f);
+				glm::mat4 lightView = glm::lookAt(-light->m_direction * 10.0f, glm::vec3(0.0), glm::vec3(0, 1, 0));
+
+				m_DirectionalLights[i]->m_lightSpaceViewPrrojection = lightProjection * lightView;
+				m_DirectionalLights[i]->m_shadowMatRenderTarget = m_ShadowRenderTargets[shadowRtIndex];
+
+				for (int j = 0; j < solids.size(); ++j)
+				{
+					RenderShadowCastCommand(&solids[j], lightView, lightProjection);
+				}
+				++shadowRtIndex;
+			}
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		m_glState.SetCullFace(GL_BACK);
+	}
+
+	glClearColor(0.2f, 0.2f, 0.6f, 1.0f);
+	glViewport(0, 0, m_renderTargetWidth, m_renderTargetHeight);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (RenderCommand rc : solids)
 	{
@@ -191,6 +276,19 @@ void SimpleRenderer::RenderPushedCommands()
 		currentShader->SetMatrix("model", rc.Transform);
 		currentShader->SetMatrix("prevModel", rc.PrevTransform);
 
+		currentShader->SetBool("ShadowsEnabled", m_enableShadows);
+		if (m_enableShadows && rc.Material->Type == MATERIAL_CUSTOM && rc.Material->ShadowReceive)
+		{
+			for (int i = 0; i < m_DirectionalLights.size(); ++i)
+			{
+				if (m_DirectionalLights[i]->m_shadowMatRenderTarget)
+				{
+					currentShader->SetMatrix("lightShadowViewProjection" + std::to_string(i + 1), m_DirectionalLights[i]->m_lightSpaceViewPrrojection);
+					m_DirectionalLights[i]->m_shadowMatRenderTarget->GetDepthStencilTexture()->Bind(10 + i);
+				}
+			}
+		}
+
 		std::map<std::string, UniformValueSampler>* samplers = rc.Material->GetSamplerUniforms();
 		for (auto it = samplers->begin(), end = samplers->end(); it != end; ++it)
 		{
@@ -243,19 +341,8 @@ void SimpleRenderer::RenderPushedCommands()
 		}
 
 		// Render Mesh
-		glBindVertexArray(rc.Mesh->m_VAO);
-
-		const GLenum mode = rc.Mesh->Topology == TRIANGLE_STRIP ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
-		if (!rc.Mesh->Indices.empty()) 
-		{
-			glDrawElements(mode, rc.Mesh->Indices.size(), GL_UNSIGNED_INT, 0);
-		}
-		else
-		{
-			glDrawArrays(mode, 0, rc.Mesh->Positions.size());
-		}
+		RenderMesh(rc.Mesh);
 	}
-
 	solids.clear();
 
 
@@ -382,20 +469,14 @@ void SimpleRenderer::RenderPushedCommands()
 		}
 
 		// Render Mesh
-		glBindVertexArray(rc.Mesh->m_VAO);
-
-		const GLenum mode = rc.Mesh->Topology == TRIANGLE_STRIP ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
-		if (!rc.Mesh->Indices.empty())
-		{
-			glDrawElements(mode, rc.Mesh->Indices.size(), GL_UNSIGNED_INT, 0);
-		}
-		else
-		{
-			glDrawArrays(mode, 0, rc.Mesh->Positions.size());
-		}
+		RenderMesh(rc.Mesh);
 	}
 
 	transparents.clear();
+
+	// store view projection as previous view projection for next frame's motion blur
+	m_prevViewProjection = m_camera->GetProjection() * m_camera->GetView();
+
 }
 
 void SimpleRenderer::RenderUIMenu()
@@ -404,6 +485,35 @@ void SimpleRenderer::RenderUIMenu()
 	{
 		ImGui::Checkbox("Enable Frustum Culling", &m_enableFrustumCulling);
 		ImGui::Checkbox("Enable GL Cache", &m_enableGLCache);
+		ImGui::Checkbox("Enable Shadows", &m_enableShadows);
 		ImGui::EndMenu();
+	}
+}
+
+void SimpleRenderer::RenderShadowCastCommand(RenderCommand* rc, const glm::mat4& view, const glm::mat4& projection)
+{
+	Shader* shadowShader = m_materialLibrary->dirShadowShader;
+
+	shadowShader->SetMatrix("view", view);
+	shadowShader->SetMatrix("projection", projection);
+	shadowShader->SetMatrix("model", rc->Transform);
+
+	RenderMesh(rc->Mesh);
+}
+
+
+void SimpleRenderer::RenderMesh(Mesh* mesh)
+{
+	// Render Mesh
+	glBindVertexArray(mesh->m_VAO);
+
+	const GLenum mode = mesh->Topology == TRIANGLE_STRIP ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
+	if (!mesh->Indices.empty())
+	{
+		glDrawElements(mode, mesh->Indices.size(), GL_UNSIGNED_INT, 0);
+	}
+	else
+	{
+		glDrawArrays(mode, 0, mesh->Positions.size());
 	}
 }

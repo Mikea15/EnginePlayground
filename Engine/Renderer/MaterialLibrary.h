@@ -7,6 +7,7 @@
 
 class Material;
 class Renderer;
+class SimpleRenderer;
 class Shader;
 class RenderTarget;
 
@@ -19,6 +20,7 @@ class RenderTarget;
 class MaterialLibrary
 {
 	friend Renderer;
+	friend SimpleRenderer;
 private:
 	// holds a list of default material templates that other materials can derive from
 	std::map<unsigned int, Material*> m_DefaultMaterials;

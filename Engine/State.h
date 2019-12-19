@@ -10,6 +10,7 @@ union SDL_Event;
 #include "Scene/Scene.h"
 #include "Scene/SceneNode.h"
 #include "Scene/Skybox.h"
+#include "Lighting/DirectionalLight.h"
 #include "Mesh/Plane.h"
 #include "Mesh/Sphere.h"
 #include "Mesh/Torus.h"
@@ -137,10 +138,15 @@ public:
 		// Material* customPostProcessing2 = renderer->CreatePostProcessingMaterial(postProcessing2);
 
 		// mesh 
-		sponza = Resources::LoadMesh(renderer, "sponza", "meshes/sponza/sponza.obj");
-		// sponza->Material = defaultForwardMat;
-		sponza->SetPosition(glm::vec3(0.0, -1.0, 0.0));
-		sponza->SetScale(0.01f);
+		//sponza = Resources::LoadMesh(renderer, "sponza", "meshes/sponza/sponza.obj");
+		//sponza->SetPosition(glm::vec3(0.0, -1.0, 0.0));
+		//sponza->SetScale(0.01f);
+
+		m_directionalLight.m_direction = -glm::normalize(glm::vec3(5.0f, 10.0f, 5.0f));
+		m_directionalLight.m_intensity = 1.0f;
+		m_directionalLight.m_color = glm::vec3(0.2f, 0.5f, 0.3f);
+
+		renderer->AddLight(&m_directionalLight);
 	};
 
 	void HandleInput(SDL_Event* event) override 
@@ -190,11 +196,11 @@ public:
 
 	void Render(float alpha = 1.0f) override 
 	{
-		//renderer->PushRender(planeNode);
+		renderer->PushRender(planeNode);
 		//renderer->PushRender(mainTorus);
-		renderer->PushRender(sponza);
+		//renderer->PushRender(sponza);
 		//renderer->PushRender(plasmaOrb);
-		// renderer->PushRender(background);
+		//renderer->PushRender(background);
 
 		for (SceneNode* node : m_randomNodes)
 		{
@@ -249,6 +255,8 @@ private:
 	SceneNode* thirdTorus;
 	SceneNode* plasmaOrb;
 	SceneNode* planeNode;
+
+	DirectionalLight m_directionalLight;
 
 	std::vector<SceneNode*> m_randomNodes;
 

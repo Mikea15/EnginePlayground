@@ -13,6 +13,8 @@ class SceneNode;
 class Camera;
 class MaterialLibrary;
 class Shader;
+class RenderTarget;
+class DirectionalLight;
 
 class SimpleRenderer
 	: public IRenderer
@@ -33,6 +35,8 @@ public:
 	void PushRender(Mesh* mesh, Material* material, glm::mat4 transform = glm::mat4(1.0f), glm::mat4 prevTransform = glm::mat4(1.0f));
 	void PushRender(SceneNode* node);
 
+	void AddLight(DirectionalLight* light) { m_DirectionalLights.push_back(light); }
+
 	void RenderPushedCommands();
 
 	int GetRenderWidth() const { return m_renderTargetWidth; }
@@ -41,16 +45,33 @@ public:
 	void RenderUIMenu();
 
 private:
+	void RenderShadowCastCommand(RenderCommand* rc, const glm::mat4& view, const glm::mat4& projection);
+	void RenderMesh(Mesh* mesh);
+
+private:
 	std::vector<RenderCommand> m_renderCommands;
+
+	// lighting
+	std::vector<DirectionalLight*> m_DirectionalLights;
+
+	// shadow buffers
+	std::vector<RenderTarget*> m_ShadowRenderTargets;
+	std::vector<glm::mat4>    m_ShadowViewProjections;
 
 	int m_renderTargetHeight;
 	int m_renderTargetWidth;
 
 	Camera* m_camera;
+	glm::mat4 m_prevViewProjection;
+
 	GLStateCache m_glState;
 	MaterialLibrary* m_materialLibrary;
 
 	bool m_enableGLCache = false;
 	bool m_enableFrustumCulling = false;
+	bool m_enableShadows = false;
+
+	// ubo
+	unsigned int m_GlobalUBO;
 };
 

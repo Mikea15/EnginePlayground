@@ -67,9 +67,9 @@ private:
 	GLStateCache m_glState;
 	MaterialLibrary* m_materialLibrary;
 
-	bool m_enableGLCache = false;
+	bool m_enableGLCache = true;
 	bool m_enableFrustumCulling = false;
-	bool m_enableShadows = false;
+	bool m_enableShadows = true;
 
 	// ubo
 	unsigned int m_GlobalUBO;

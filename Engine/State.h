@@ -142,9 +142,9 @@ public:
 		//sponza->SetPosition(glm::vec3(0.0, -1.0, 0.0));
 		//sponza->SetScale(0.01f);
 
-		m_directionalLight.m_direction = -glm::normalize(glm::vec3(5.0f, 10.0f, 5.0f));
-		m_directionalLight.m_intensity = 1.0f;
-		m_directionalLight.m_color = glm::vec3(0.2f, 0.5f, 0.3f);
+		m_directionalLight.m_direction = -glm::normalize(glm::vec3(0.0f, 10.0f, 0.0f));
+		m_directionalLight.m_intensity = 10.0f;
+		m_directionalLight.m_color = glm::vec3(0.9f, 0.8f, 0.8f);
 
 		renderer->AddLight(&m_directionalLight);
 	};

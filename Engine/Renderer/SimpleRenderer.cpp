@@ -345,8 +345,8 @@ void SimpleRenderer::RenderPushedCommands()
 	}
 	solids.clear();
 
-
-	// Try front to back render for transparents.
+#if 0
+	// back to front render for transparents.
 	std::sort(transparents.begin(), transparents.end(), [](RenderCommand lhs, RenderCommand rhs) {
 		return lhs.Transform[3].z > rhs.Transform[3].z;
 		});
@@ -473,6 +473,7 @@ void SimpleRenderer::RenderPushedCommands()
 	}
 
 	transparents.clear();
+#endif
 
 	// store view projection as previous view projection for next frame's motion blur
 	m_prevViewProjection = m_camera->GetProjection() * m_camera->GetView();

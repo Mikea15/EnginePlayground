@@ -5,6 +5,7 @@
 #include "Mesh/Mesh.h"
 #include "Shading/Material.h"
 
+#include <imgui.h>
 #include <assert.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -185,4 +186,37 @@ void SceneNode::UpdateTransform(bool updatePrevTransform)
 		m_children[i]->UpdateTransform(updatePrevTransform);
 	}
 	m_isDirty = false;
+}
+
+void SceneNode::ShowNode(int depth)
+{
+	ImGui::PushID(m_id);               // Use object uid as identifier. Most commonly you could also use the object pointer as a base ID.
+	ImGui::AlignTextToFramePadding();  // Text and Tree nodes are less high than regular widgets, here we add vertical spacing to make the tree lines equal high.
+	
+	bool node_open = ImGui::TreeNode("Object", "%s_%u", "-", m_id);
+	
+	ImGui::NextColumn();
+	ImGui::AlignTextToFramePadding();
+
+	unsigned int childCount = m_children.size();
+	ImGui::Text("Children: %d", childCount);
+
+	ImGui::NextColumn();
+
+	if (node_open)
+	{
+		ImGui::NextColumn();
+		ImGui::AlignTextToFramePadding();
+
+		ImGui::Text("Data when open");
+
+		ImGui::NextColumn();
+
+		for (int i = 0; i < childCount; ++i)
+		{
+			m_children[i]->ShowNode(depth++);
+		}
+		ImGui::TreePop();
+	}
+	ImGui::PopID();
 }

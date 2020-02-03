@@ -30,6 +30,11 @@ Shader ShaderLoader::Load(std::string name, std::string vsPath, std::string fsPa
 	return shader;
 }
 
+Shader ShaderLoader::LoadWithString(std::string name, std::string vsString, std::string fsString, std::vector<std::string> defines)
+{
+	return Shader(name, vsString, fsString, defines);
+}
+
 std::string ShaderLoader::readShader(std::ifstream& file, const std::string& name, std::string path)
 {
 	std::string directory = path.substr(0, path.find_last_of("/\\"));

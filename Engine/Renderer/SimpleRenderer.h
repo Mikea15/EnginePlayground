@@ -9,6 +9,8 @@
 #include "RenderCommand.h"
 #include "GLStateCache.h"
 
+#include "DebugDraw.h"
+
 class SceneNode;
 class Camera;
 class MaterialLibrary;

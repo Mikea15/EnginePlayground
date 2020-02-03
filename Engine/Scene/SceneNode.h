@@ -52,6 +52,8 @@ public:
 
 	void UpdateTransform(bool updatePrevTransform = false);
 
+	void ShowNode(int depth);
+
 public:
 	Mesh* Mesh{};
 	Material* Material{};

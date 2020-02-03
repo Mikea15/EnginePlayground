@@ -22,9 +22,8 @@ void main()
     up         = cross(N, right);
 
     vec3 irradiance = vec3(0.0);
-	int samples = 0;
-	
-	float sampleDelta = 0.025f;
+    int samples = 0;
+    float sampleDelta = 0.025f;
 
     for(float phi = 0.0; phi < 2.0*PI; phi += sampleDelta)
     {
@@ -32,8 +31,8 @@ void main()
         {
             vec3 tangentSample = vec3(cos(phi) * sin(theta), sin(phi) * sin(theta), cos(theta));
             vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N;
-
-			// TODO(Joey): use HDRi map as input; from spherical to cube.
+            
+            // TODO(Joey): use HDRi map as input; from spherical to cube.
             // NOTE(Joey): no need to store linearized, as HDR map is already in linear space.
             irradiance += texture(environment, sampleVec).rgb * cos(theta) * sin(theta);
             // NOTE(Joey): here we don't divide by PI as this is implicit in the environment's lighting.

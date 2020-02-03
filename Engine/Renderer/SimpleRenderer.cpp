@@ -477,7 +477,6 @@ void SimpleRenderer::RenderPushedCommands()
 
 	// store view projection as previous view projection for next frame's motion blur
 	m_prevViewProjection = m_camera->GetProjection() * m_camera->GetView();
-
 }
 
 void SimpleRenderer::RenderUIMenu()

@@ -4,19 +4,22 @@ union SDL_Event;
 
 #include "Game.h"
 #include "Renderer/SimpleRenderer.h"
+#include "Scene/Skybox.h"
 #include "Shading/Material.h"
 #include "Shading/Shader.h"
 #include "Resources/Resources.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneNode.h"
-#include "Scene/Skybox.h"
 #include "Lighting/DirectionalLight.h"
 #include "Mesh/Plane.h"
 #include "Mesh/Sphere.h"
 #include "Mesh/Torus.h"
 #include "Mesh/Cube.h"
 
+#include "Systems/QuadTree.h"
+
 #include "Utils/MathUtils.h"
+#include "Renderer/DebugDraw.h"
 
 
 #include <stack>
@@ -50,6 +53,9 @@ public:
 		m_game = game;
 		renderer = m_game->GetRenderer();
 		renderer->SetCamera(&m_camera);
+
+		// debug draw init
+		DebugDraw::Init();
 
 		// basic shapes
 		plane = new Plane(50, 50);
@@ -103,29 +109,39 @@ public:
 		plasmaOrb->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		plasmaOrb->SetScale(0.6f);
 
+		m_qTree = QuadTree(glm::vec3(0.0f), 50.0f);
+
 		const float spacing = 5.2f;
 		for (int x = 0; x < 10; ++x)
 		{
-			for (int z = 0; z < 10; ++z)
+			for (int z = 0; z < 4; ++z)
 			{
-				for (int y = 0; y < 10; ++y)
+				for (int y = 0; y < 4; ++y)
 				{
 					glm::vec3 position = glm::vec3(0.0f, 0.5f, 0.0f) + glm::vec3(x - 5, y, z - 5) * spacing;
 
 					float rand = MathUtils::Rand01();
-					SceneNode* node = Scene::MakeSceneNode(tSphere, rand < 0.5f ? defaultForwardMat : defaultForwardMatAlpha);
+					SceneNode* node = Scene::MakeSceneNode(tSphere, rand < 1.0f ? defaultForwardMat : defaultForwardMatAlpha);
 					node->SetPosition(position);
 
 					const float randomScale = MathUtils::Rand(0.5f, 2.3f);
 					node->SetScale(randomScale);
 
 					m_randomNodes.push_back(node);
+
+					glm::vec3 min = { position.x + node->BoxMin.x * randomScale, position.y + node->BoxMin.y * randomScale, position.z + node->BoxMin.z * randomScale};
+					glm::vec3 max = { position.x + node->BoxMax.x * randomScale, position.y + node->BoxMax.y * randomScale, position.z + node->BoxMax.z * randomScale};
+					glm::vec4 green = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+					// DebugDraw::AddAABB(min, max, green);
+
+					m_qTree.Insert(position);
 				}
 			}
 		}
 
 		//// - background
-		//Skybox* background = new Skybox;
+		// Skybox* background = new Skybox();
 		//PBRCapture* pbrEnv = rendererPtr->GetSkypCature();
 		//background->SetCubemap(pbrEnv->Prefiltered);
 		//float lodLevel = 1.5f;
@@ -147,6 +163,48 @@ public:
 		m_directionalLight.m_color = glm::vec3(0.9f, 0.8f, 0.8f);
 
 		renderer->AddLight(&m_directionalLight);
+
+		const int GRID_LINES = 10;
+		const float lineLength = 50.0f;
+		for (int y = -GRID_LINES; y <= GRID_LINES; ++y)
+		{
+			glm::vec3 start = { -lineLength, 0.01f, y };
+			glm::vec3 end = { lineLength, 0.01f, y };
+			DebugDraw::AddLine(start, end, { 1.0f, 1.0f, 1.0f, 0.1f });
+		}
+
+		for (int x = -GRID_LINES; x <= GRID_LINES; ++x)
+		{
+			glm::vec3 start = { x, 0.01f, -lineLength };
+			glm::vec3 end = { x, 0.01f, lineLength };
+			DebugDraw::AddLine(start, end, { 1.0f, 1.0f, 1.0f, 0.1f });
+		}
+		
+		FlyCamera decoyCam(glm::vec3(0.0f, 0.0f, 0.0f));
+		decoyCam.SetPerspective(75.0f, 16.0f / 9.0f, 1.0f, 15.0f);
+		auto& camFrustum = decoyCam.GetFrustum();
+		DebugDraw::AddFrustrum(camFrustum.FTL, camFrustum.FTR, camFrustum.FBL, camFrustum.FBR,
+			camFrustum.NTL, camFrustum.NTR, camFrustum.NBL, camFrustum.NBR, {1.0f, 0.2f, 0.2f, 1.0f});
+
+		//
+		std::vector<Rect> quadTreeVis;
+		m_qTree.GetAllBoundingBoxes(quadTreeVis);
+		const unsigned int qSize = static_cast<unsigned int>(quadTreeVis.size());
+		for (unsigned int i = 0; i < qSize; ++i)
+		{
+			auto pos2D = quadTreeVis[i].GetPosition();
+
+			auto min0 = quadTreeVis[i].GetMin();
+			auto max0 = quadTreeVis[i].GetMax();
+			auto min1 = min0; min1.x = max0.x;
+			auto max1 = max0; max1.y = min0.y;
+
+			DebugDraw::AddLine({ min0.x, 0.0f, min0.y }, { min1.x, 0.0f, min1.y }, { 0.2f, 0.8f, 0.4f, 1.0f });
+			DebugDraw::AddLine({ min1.x, 0.0f, min1.y }, { max0.x, 0.0f, max0.y }, { 0.2f, 0.8f, 0.4f, 1.0f });
+			DebugDraw::AddLine({ max1.x, 0.0f, max1.y }, { max0.x, 0.0f, max0.y }, { 0.2f, 0.8f, 0.4f, 1.0f });
+			DebugDraw::AddLine({ max1.x, 0.0f, max1.y }, { min0.x, 0.0f, min0.y }, { 0.2f, 0.8f, 0.4f, 1.0f });
+		}
+		//
 	};
 
 	void HandleInput(SDL_Event* event) override 
@@ -197,7 +255,7 @@ public:
 	void Render(float alpha = 1.0f) override 
 	{
 		renderer->PushRender(planeNode);
-		//renderer->PushRender(mainTorus);
+		// renderer->PushRender(mainTorus);
 		//renderer->PushRender(sponza);
 		//renderer->PushRender(plasmaOrb);
 		//renderer->PushRender(background);
@@ -208,6 +266,14 @@ public:
 		}
 
 		renderer->RenderPushedCommands();
+
+		glm::mat4 viewProj = m_camera.GetViewProjection();
+		DebugDraw::Update(viewProj);
+
+		bool x_ray = false;
+		DebugDraw::Draw(x_ray);
+
+		DebugDraw::Clear();
 	};
 
 	void RenderUI() 
@@ -233,8 +299,13 @@ public:
 			renderer->RenderUIMenu();
 			ImGui::EndMainMenuBar();
 		}
+
+		Scene::DrawSceneUI();
 	};
-	void Cleanup() override {};
+	void Cleanup() override {
+		// free db drawing memory
+		DebugDraw::Clean();
+	};
 
 private:
 	Game* m_game;
@@ -265,4 +336,6 @@ private:
 	float m_inputMoveRight = 0.0f;
 	float m_inputMoveForward = 0.0f;
 	bool m_inputEnableMovementBoost = false;
+
+	QuadTree m_qTree;
 };

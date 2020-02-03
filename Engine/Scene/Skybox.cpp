@@ -10,14 +10,15 @@
 #include "Mesh/Cube.h"
 
 
-Skybox::Skybox() : SceneNode(Scene::CounterID++)
+Skybox::Skybox() 
+	: SceneNode(Scene::CounterID++)
 {
 	// Auto Add Skybox to scene.
 	Scene::Root->AddChild(this);
 
 	m_shader = Resources::LoadShader("background", "shaders/background.vs", "shaders/background.fs");
-	Material = new Material(m_shader);
-	Mesh = new Cube;
+	// Material = new Material(m_shader);
+	Mesh = new Cube();
 	BoxMin = glm::vec3(-99999.0);
 	BoxMax = glm::vec3(99999.0);
 
@@ -37,5 +38,5 @@ Skybox::~Skybox()
 void Skybox::SetCubemap(TextureCube* cubemap)
 {
 	m_cubeMap = cubemap;
-	Material->SetTextureCube("background", m_cubeMap, 0);
+	// Material->SetTextureCube("background", m_cubeMap, 0);
 }

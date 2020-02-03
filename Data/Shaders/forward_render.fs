@@ -26,15 +26,19 @@ void main()
     #ifdef ALPHA_BLEND
         albedo.rgb *= albedo.a; // pre-multiplied alpha
     #endif
+
     float metallic = texture(TexMetallic, TexCoords).r;
     float roughness = texture(TexRoughness, TexCoords).r;
     vec3 N = normalize(Normal); // TODO: normal mapping
     vec3 L = normalize(-dirLight0_Dir.xyz);
     
-    vec3 color = PBRAnalyticLighting(
-        albedo.rgb, N, metallic, roughness, camPos.xyz,
-        FragPos, vec4(dirLight0_Dir.xyz, 0.0), dirLight0_Col.rgb, 0.0
-    );
+    //vec3 color = PBRAnalyticLighting(
+    //    albedo.rgb, N, metallic, roughness, camPos.xyz,
+    //    FragPos, vec4(dirLight0_Dir.xyz, 0.0), dirLight0_Col.rgb, 0.0
+    //);
+
+    vec3 color = 0.3 + albedo.xyz * dot(N, L);
+
     vec4 fragPosLightSpace = lightShadowViewProjection1 * vec4(FragPos, 1.0);
     float shadow = ShadowFactor(lightShadowMap1, fragPosLightSpace, N, L);
     color.rgb *= max(1.0 - shadow, 0.1);

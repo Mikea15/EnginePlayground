@@ -32,5 +32,7 @@ public:
 
 	// deletes a scene node from the global scene hierarchy (together with its  children).
 	static void DeleteSceneNode(SceneNode* node);
+
+	static void DrawSceneUI();
 };
 

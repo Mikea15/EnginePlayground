@@ -36,8 +36,9 @@ Camera::Camera(glm::vec3 position, glm::vec3 forward, glm::vec3 up)
 
 void Camera::Update(float deltaTime)
 {
-	m_frustum.Update(this);
 	UpdateView();
+
+	m_frustum.Update( this );
 }
 
 void Camera::SetPerspective(float fov, float aspect, float near, float far)

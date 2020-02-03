@@ -35,7 +35,7 @@ void main()
     vec3 V = normalize(camPos.xyz - worldPos); 
     vec3 L = normalize(lightPos - worldPos);
     vec3 H = normalize(V + L);     
-	              
+          
     vec3 F0 = vec3(0.04); 
     F0 = mix(F0, albedo, metallic);
           
@@ -52,7 +52,7 @@ void main()
     
     vec3 kS = F;
     vec3 kD = vec3(1.0) - kS;
-    kD *= 1.0 - metallic;	  
+    kD *= 1.0 - metallic;
     
     vec3 nominator    = NDF * G * F;
     float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 

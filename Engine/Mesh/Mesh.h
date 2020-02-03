@@ -8,7 +8,9 @@
 
 
 static const double PI = 3.14159265359;
+#ifndef TAU
 static const double TAU = 2.0 * PI;
+#endif
 
 /*
 

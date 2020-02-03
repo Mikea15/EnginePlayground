@@ -6,6 +6,7 @@
 
 #include <stack>
 
+#include <imgui.h>
 
 SceneNode* Scene::Root = new SceneNode(0);
 unsigned int Scene::CounterID = 0;
@@ -32,8 +33,8 @@ SceneNode* Scene::MakeSceneNode(Mesh* mesh, Material* material)
 	node->Mesh = mesh;
 	node->Material = material;
 
-	node->BoxMin = glm::vec3(-0.5f);
-	node->BoxMax = glm::vec3(0.5f);
+	node->BoxMin = glm::vec3(-1.0f);
+	node->BoxMax = glm::vec3(1.0f);
 
 	// keep a global rerefence to this scene node s.t. we can clear the scene's nodes for 
 	// memory management: end of program or when switching scenes.
@@ -82,5 +83,23 @@ void Scene::DeleteSceneNode(SceneNode* node)
 	}
 	// all delete logic is contained within each scene node's destructor.
 	delete node;
+}
+
+void Scene::DrawSceneUI()
+{
+	ImGui::Begin("SceneOutliner");
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+	ImGui::Columns(2);
+	ImGui::Separator();
+
+	SceneNode* node = Root;
+	node->ShowNode(0);
+
+	ImGui::Columns(1);
+	ImGui::Separator();
+	ImGui::PopStyleVar();
+
+	ImGui::End();
 }
 

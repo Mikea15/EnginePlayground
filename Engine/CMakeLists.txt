@@ -42,6 +42,8 @@ add_library(
 
 	Renderer/CommandBuffer.cpp
 	Renderer/CommandBuffer.h
+	Renderer/DebugDraw.cpp
+	Renderer/DebugDraw.h
 	Renderer/GLStateCache.cpp
 	Renderer/GLStateCache.h
 	Renderer/IRenderer.h
@@ -74,8 +76,8 @@ add_library(
 	Scene/Scene.h
 	Scene/SceneNode.cpp
 	Scene/SceneNode.h
-	#Scene/Skybox.cpp
-	#Scene/Skybox.h
+	Scene/Skybox.cpp
+	Scene/Skybox.h
 
 	Shading/Material.cpp
 	Shading/Material.h
@@ -94,6 +96,11 @@ add_library(
 
 	Systems/GameFrameTime.cpp
 	Systems/GameFrameTime.h
+	Systems/QuadTree.h
+	Systems/QuadTree.h
+	Systems/Rect.h
+	Systems/Rect.h
+
 
 	Utils/FileIO.h
 	Utils/Logger.h
@@ -110,7 +117,7 @@ add_library(
 	Game.cpp
 	Game.h
 	State.h
-)
+ "Renderer/DebugDraw.cpp" "Systems/QuadTree.cpp" "Systems/Rect.cpp")
 
 # TODO: Add tests and install targets if needed.
 find_package(glm CONFIG REQUIRED)

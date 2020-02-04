@@ -12,6 +12,7 @@
 #include "RenderTarget.h"
 
 #include "Utils/Logger.h"
+#include "DebugDraw.h"
 
 #include <stack>
 #include <algorithm>
@@ -85,8 +86,8 @@ void SimpleRenderer::PushRender(Mesh* mesh, Material* material, glm::mat4 transf
 	command.Material = material;
 	command.Transform = transform;
 	command.PrevTransform = prevTransform;
-	command.BoxMin = glm::vec3(-10000.0f);
-	command.BoxMax = glm::vec3(10000.0f);
+	command.BoxMin = glm::vec3(-1.0f);
+	command.BoxMax = glm::vec3(1.0f);
 
 	m_renderCommands.push_back(command);
 }
@@ -106,14 +107,16 @@ void SimpleRenderer::PushRender(SceneNode* node)
 		{
 			const glm::vec3 boxMinWorld = node->GetWorldPosition() + (node->GetWorldScale() * node->BoxMin);
 			const glm::vec3 boxMaxWorld = node->GetWorldPosition() + (node->GetWorldScale() * node->BoxMax);
+			const glm::vec3 boxMin = node->GetLocalPosition() + (node->GetLocalScale() * node->BoxMin);
+			const glm::vec3 boxMax = node->GetLocalPosition() + (node->GetLocalScale() * node->BoxMax);
 
 			RenderCommand command;
 			command.Mesh = currentNode->Mesh;
 			command.Material = currentNode->Material;
 			command.Transform = currentNode->GetTransform();
 			command.PrevTransform = currentNode->GetPrevTransform();
-			command.BoxMin = boxMinWorld;
-			command.BoxMax = boxMaxWorld;
+			command.BoxMin = boxMin;
+			command.BoxMax = boxMax;
 			m_renderCommands.push_back(command);
 		}
 
@@ -212,10 +215,14 @@ void SimpleRenderer::RenderPushedCommands()
 
 	for (RenderCommand rc : solids)
 	{
+
 		// Frustum Culling.
 		if (m_enableFrustumCulling && !m_camera->GetFrustum().Intersect(rc.BoxMin, rc.BoxMax)) {
+			DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 1.0f, 1.0f, 1.0f, 1.0f });
 			continue;
 		}
+
+		DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 0.0f, 1.0f, 0.0f, 1.0f });
 
 		Shader* currentShader = rc.Material->GetShader();
 

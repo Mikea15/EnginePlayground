@@ -62,6 +62,8 @@ add_library(
 	Renderer/RenderTarget.h
 	Renderer/SimpleRenderer.cpp
 	Renderer/SimpleRenderer.h
+	Renderer/ViewportGrid.cpp
+	Renderer/ViewportGrid.h
 
 	Resources/MeshLoader.cpp
 	Resources/MeshLoader.h
@@ -107,9 +109,9 @@ add_library(
 	Systems/Octree.h
 	Systems/GameFrameTime.cpp
 	Systems/GameFrameTime.h
+	Systems/QuadTree.cpp
 	Systems/QuadTree.h
-	Systems/QuadTree.h
-	Systems/Rect.h
+	Systems/Rect.cpp
 	Systems/Rect.h
 
 
@@ -128,7 +130,8 @@ add_library(
 	Game.cpp
 	Game.h
 	State.h
- "Renderer/DebugDraw.cpp" "Systems/QuadTree.cpp" "Systems/Rect.cpp" "Systems/AABB.cpp" "Systems/BoundingSphere.cpp" "Systems/BoundingFrustum.cpp" "Systems/Plane.cpp" "Systems/Octree.cpp")
+ 
+ )
 
 # TODO: Add tests and install targets if needed.
 find_package(glm CONFIG REQUIRED)

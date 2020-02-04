@@ -4,6 +4,7 @@ union SDL_Event;
 
 #include "Game.h"
 #include "Renderer/SimpleRenderer.h"
+#include "Renderer/ViewportGrid.h"
 #include "Scene/Skybox.h"
 #include "Shading/Material.h"
 #include "Shading/Shader.h"
@@ -133,7 +134,7 @@ public:
 					glm::vec3 max = { position.x + node->BoxMax.x * randomScale, position.y + node->BoxMax.y * randomScale, position.z + node->BoxMax.z * randomScale};
 					glm::vec4 green = { 0.0f, 1.0f, 0.0f, 1.0f };
 
-					// DebugDraw::AddAABB(min, max, green);
+					DebugDraw::AddAABB(min, max, green);
 
 					m_qTree.Insert(position);
 				}
@@ -164,27 +165,11 @@ public:
 
 		renderer->AddLight(&m_directionalLight);
 
-		const int GRID_LINES = 10;
-		const float lineLength = 50.0f;
-		for (int y = -GRID_LINES; y <= GRID_LINES; ++y)
-		{
-			glm::vec3 start = { -lineLength, 0.01f, y };
-			glm::vec3 end = { lineLength, 0.01f, y };
-			DebugDraw::AddLine(start, end, { 1.0f, 1.0f, 1.0f, 0.1f });
-		}
+		m_viewGrid = ViewportGrid(100, 100, 100, 100);
 
-		for (int x = -GRID_LINES; x <= GRID_LINES; ++x)
-		{
-			glm::vec3 start = { x, 0.01f, -lineLength };
-			glm::vec3 end = { x, 0.01f, lineLength };
-			DebugDraw::AddLine(start, end, { 1.0f, 1.0f, 1.0f, 0.1f });
-		}
-		
-		// FlyCamera decoyCam(glm::vec3(0.0f, 0.0f, 0.0f));
-		// decoyCam.SetPerspective(75.0f, 16.0f / 9.0f, 1.0f, 15.0f);
-		// auto& camFrustum = decoyCam.GetFrustum();
-		//DebugDraw::AddFrustrum(camFrustum.FTL, camFrustum.FTR, camFrustum.FBL, camFrustum.FBR,
-		//	camFrustum.NTL, camFrustum.NTR, camFrustum.NBL, camFrustum.NBR, {1.0f, 0.2f, 0.2f, 1.0f});
+		auto& camFrustum = m_camera.GetFrustum();
+		DebugDraw::AddFrustrum(camFrustum.FTL, camFrustum.FTR, camFrustum.FBL, camFrustum.FBR,
+			camFrustum.NTL, camFrustum.NTR, camFrustum.NBL, camFrustum.NBR, {1.0f, 0.2f, 0.2f, 1.0f});
 
 		//
 		std::vector<Rect> quadTreeVis;
@@ -250,6 +235,19 @@ public:
 		mainTorus->SetRotation(glm::vec4(glm::vec3(1.0f, 0.0f, 0.0f), m_game->GetTimeMS() * 10.0f * 2.0f));
 		secondTorus->SetRotation(glm::vec4(glm::vec3(0.0f, 1.0f, 0.0f), m_game->GetTimeMS() * 10.0f * 3.0f));
 		thirdTorus->SetRotation(glm::vec4(glm::vec3(0.0f, 1.0f, 0.0f), m_game->GetTimeMS() * 10.0f * 4.0f));
+
+		// Debug
+		DebugDraw::Clear();
+
+		// draw grid
+		m_viewGrid.Draw();
+
+		auto& camFrustum = m_camera.GetFrustum();
+		DebugDraw::AddFrustrum(camFrustum.FTL, camFrustum.FTR, camFrustum.FBL, camFrustum.FBR,
+			camFrustum.NTL, camFrustum.NTR, camFrustum.NBL, camFrustum.NBR, { 1.0f, 0.2f, 0.2f, 1.0f });
+
+		glm::mat4 viewProj = m_camera.GetViewProjection();
+		DebugDraw::Update(viewProj);
 	};
 
 	void Render(float alpha = 1.0f) override 
@@ -267,13 +265,8 @@ public:
 
 		renderer->RenderPushedCommands();
 
-		glm::mat4 viewProj = m_camera.GetViewProjection();
-		DebugDraw::Update(viewProj);
-
 		bool x_ray = false;
 		DebugDraw::Draw(x_ray);
-
-		DebugDraw::Clear();
 	};
 
 	void RenderUI() 
@@ -338,4 +331,5 @@ private:
 	bool m_inputEnableMovementBoost = false;
 
 	QuadTree m_qTree;
+	ViewportGrid m_viewGrid;
 };

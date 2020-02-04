@@ -16,15 +16,7 @@ namespace DebugDraw
 
 	GLint m_viewProjecLoc = -1;
 
-	struct Line 
-	{
-		Line(const glm::vec3& start, const glm::vec3& end, const glm::vec4& col)
-			: start(start), end(end), col(col)
-		{ }
-
-		glm::vec3 start, end;
-		glm::vec4 col;
-	};
+	
 
 	std::vector<Line> m_lines;
 
@@ -120,7 +112,7 @@ namespace DebugDraw
 
 	void Clear()
 	{
-		// m_lines.clear();
+		m_lines.clear();
 	}
 
 	//

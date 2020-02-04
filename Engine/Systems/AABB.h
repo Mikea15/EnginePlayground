@@ -33,6 +33,9 @@ public:
 	const float GetSize() const { return m_halfSize; }
 	const float GetExtent() const { return fabsf(m_max.x - m_min.x); }
 
+	const glm::vec3 GetMin() const { return m_min; }
+	const glm::vec3 GetMax() const { return m_max; }
+
 private:
 	float m_halfSize;
 	glm::vec3 m_origin;

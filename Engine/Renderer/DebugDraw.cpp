@@ -157,6 +157,21 @@ namespace DebugDraw
 		return id;
 	}
 
+	int AddRect(const glm::vec2& min, const glm::vec2& max, const glm::vec4& col)
+	{
+		glm::vec2 bfl = min;
+		glm::vec2 bfr = min; bfr.x = max.x;
+		glm::vec2 bbr = min; bbr.x = max.x; bbr.y = max.y;
+		glm::vec2 bbl = min; bbl.y = max.y;
+
+		int id = AddLine( { bfl.x, 0.0f, bfl.y }, { bfr.x, 0.0f, bfr.y }, col);
+				 AddLine( { bbl.x, 0.0f, bbl.y }, { bbr.x, 0.0f, bbr.y }, col);
+				 AddLine( { bfl.x, 0.0f, bfl.y }, { bbl.x, 0.0f, bbl.y }, col);
+				 AddLine( { bfr.x, 0.0f, bfr.y }, { bbr.x, 0.0f, bbr.y }, col);
+
+		return id;
+	}
+
 	int AddAABB(const glm::vec3& min, const glm::vec3& max, const glm::vec4& col)
 	{
 		glm::vec3 bfl = min;

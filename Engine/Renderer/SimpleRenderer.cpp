@@ -218,11 +218,11 @@ void SimpleRenderer::RenderPushedCommands()
 
 		// Frustum Culling.
 		if (m_enableFrustumCulling && !m_camera->GetFrustum().Intersect(rc.BoxMin, rc.BoxMax)) {
-			DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 1.0f, 1.0f, 1.0f, 1.0f });
+			// DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 1.0f, 1.0f, 1.0f, 1.0f });
 			continue;
 		}
 
-		DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 0.0f, 1.0f, 0.0f, 1.0f });
+		// DebugDraw::AddAABB(rc.BoxMin, rc.BoxMax, { 0.0f, 1.0f, 0.0f, 1.0f });
 
 		Shader* currentShader = rc.Material->GetShader();
 

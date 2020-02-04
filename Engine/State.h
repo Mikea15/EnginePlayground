@@ -18,6 +18,7 @@ union SDL_Event;
 #include "Mesh/Cube.h"
 
 #include "Systems/QuadTree.h"
+#include "Systems/Octree.h"
 
 #include "Utils/MathUtils.h"
 #include "Renderer/DebugDraw.h"
@@ -111,6 +112,7 @@ public:
 		plasmaOrb->SetScale(0.6f);
 
 		m_qTree = QuadTree(glm::vec3(0.0f), 50.0f);
+		m_oTree = Octree(glm::vec3(0.0f), 50.0f);
 
 		const float spacing = 5.2f;
 		for (int x = 0; x < 10; ++x)
@@ -137,6 +139,7 @@ public:
 					DebugDraw::AddAABB(min, max, green);
 
 					m_qTree.Insert(position);
+					m_oTree.Insert(position);
 				}
 			}
 		}
@@ -172,23 +175,7 @@ public:
 			camFrustum.NTL, camFrustum.NTR, camFrustum.NBL, camFrustum.NBR, {1.0f, 0.2f, 0.2f, 1.0f});
 
 		//
-		std::vector<Rect> quadTreeVis;
-		m_qTree.GetAllBoundingBoxes(quadTreeVis);
-		const unsigned int qSize = static_cast<unsigned int>(quadTreeVis.size());
-		for (unsigned int i = 0; i < qSize; ++i)
-		{
-			auto pos2D = quadTreeVis[i].GetPosition();
-
-			auto min0 = quadTreeVis[i].GetMin();
-			auto max0 = quadTreeVis[i].GetMax();
-			auto min1 = min0; min1.x = max0.x;
-			auto max1 = max0; max1.y = min0.y;
-
-			DebugDraw::AddLine({ min0.x, 0.0f, min0.y }, { min1.x, 0.0f, min1.y }, { 0.2f, 0.8f, 0.4f, 1.0f });
-			DebugDraw::AddLine({ min1.x, 0.0f, min1.y }, { max0.x, 0.0f, max0.y }, { 0.2f, 0.8f, 0.4f, 1.0f });
-			DebugDraw::AddLine({ max1.x, 0.0f, max1.y }, { max0.x, 0.0f, max0.y }, { 0.2f, 0.8f, 0.4f, 1.0f });
-			DebugDraw::AddLine({ max1.x, 0.0f, max1.y }, { min0.x, 0.0f, min0.y }, { 0.2f, 0.8f, 0.4f, 1.0f });
-		}
+		
 		//
 	};
 
@@ -239,8 +226,42 @@ public:
 		// Debug
 		DebugDraw::Clear();
 
+		if (m_drawQuadtree) 
+		{
+			// draw quadtree
+			std::vector<Rect> quadTreeVis;
+			m_qTree.GetAllBoundingBoxes(quadTreeVis);
+			const unsigned int qSize = static_cast<unsigned int>(quadTreeVis.size());
+			for (unsigned int i = 0; i < qSize; ++i)
+			{
+				auto pos2D = quadTreeVis[i].GetPosition();
+				auto min = quadTreeVis[i].GetMin();
+				auto max = quadTreeVis[i].GetMax();
+
+				DebugDraw::AddRect(min, max, { 0.2f, 0.8f, 0.4f, 1.0f });
+			}
+		}
+
+		if (m_drawOctree) 
+		{
+			// draw octree
+			std::vector<AABB> octreeVis;
+			m_oTree.GetAllBoundingBoxes(octreeVis);
+			const unsigned int oSize = static_cast<unsigned int>(octreeVis.size());
+			for (unsigned int i = 0; i < oSize; ++i)
+			{
+				auto pos = octreeVis[i].GetPosition();
+				auto min = octreeVis[i].GetMin();
+				auto max = octreeVis[i].GetMax();
+				DebugDraw::AddAABB(min, max);
+			}
+		}
+
 		// draw grid
-		m_viewGrid.Draw();
+		if (m_drawGrid) 
+		{
+			m_viewGrid.Draw();
+		}
 
 		auto& camFrustum = m_camera.GetFrustum();
 		DebugDraw::AddFrustrum(camFrustum.FTL, camFrustum.FTR, camFrustum.FBL, camFrustum.FBR,
@@ -252,15 +273,18 @@ public:
 
 	void Render(float alpha = 1.0f) override 
 	{
-		renderer->PushRender(planeNode);
-		// renderer->PushRender(mainTorus);
-		//renderer->PushRender(sponza);
-		//renderer->PushRender(plasmaOrb);
-		//renderer->PushRender(background);
-
-		for (SceneNode* node : m_randomNodes)
+		if (m_drawObjects) 
 		{
-			renderer->PushRender(node);
+			renderer->PushRender(planeNode);
+			// renderer->PushRender(mainTorus);
+			//renderer->PushRender(sponza);
+			//renderer->PushRender(plasmaOrb);
+			//renderer->PushRender(background);
+
+			for (SceneNode* node : m_randomNodes)
+			{
+				renderer->PushRender(node);
+			}
 		}
 
 		renderer->RenderPushedCommands();
@@ -287,6 +311,13 @@ public:
 				if (ImGui::MenuItem("Cut", "CTRL+X")) {}
 				if (ImGui::MenuItem("Copy", "CTRL+C")) {}
 				if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Viewport")) {
+				ImGui::Checkbox("Draw Objects", &m_drawObjects);
+				ImGui::Checkbox("Draw Quadtree", &m_drawQuadtree);
+				ImGui::Checkbox("Draw Octree", &m_drawOctree);
+				ImGui::Checkbox("Draw Grid", &m_drawGrid);
 				ImGui::EndMenu();
 			}
 			renderer->RenderUIMenu();
@@ -330,6 +361,12 @@ private:
 	float m_inputMoveForward = 0.0f;
 	bool m_inputEnableMovementBoost = false;
 
+	bool m_drawObjects = false;
+	bool m_drawQuadtree = false;
+	bool m_drawOctree = false;
+	bool m_drawGrid = false;
+
 	QuadTree m_qTree;
+	Octree m_oTree;
 	ViewportGrid m_viewGrid;
 };

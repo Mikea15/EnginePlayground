@@ -1,6 +1,6 @@
 #include "Plane.h"
 
-Plane::Plane(unsigned int xSegments, unsigned int ySegments)
+PlaneMesh::PlaneMesh(unsigned int xSegments, unsigned int ySegments)
 {
 	bool oddRow = false;
 

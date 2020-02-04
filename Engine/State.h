@@ -58,7 +58,7 @@ public:
 		DebugDraw::Init();
 
 		// basic shapes
-		plane = new Plane(50, 50);
+		plane = new PlaneMesh(50, 50);
 		sphere = new Sphere(32, 32);
 		tSphere = new Sphere(256, 256);
 		torus = new Torus(2.0f, 0.4f, 32, 32);
@@ -180,11 +180,11 @@ public:
 			DebugDraw::AddLine(start, end, { 1.0f, 1.0f, 1.0f, 0.1f });
 		}
 		
-		FlyCamera decoyCam(glm::vec3(0.0f, 0.0f, 0.0f));
-		decoyCam.SetPerspective(75.0f, 16.0f / 9.0f, 1.0f, 15.0f);
-		auto& camFrustum = decoyCam.GetFrustum();
-		DebugDraw::AddFrustrum(camFrustum.FTL, camFrustum.FTR, camFrustum.FBL, camFrustum.FBR,
-			camFrustum.NTL, camFrustum.NTR, camFrustum.NBL, camFrustum.NBR, {1.0f, 0.2f, 0.2f, 1.0f});
+		// FlyCamera decoyCam(glm::vec3(0.0f, 0.0f, 0.0f));
+		// decoyCam.SetPerspective(75.0f, 16.0f / 9.0f, 1.0f, 15.0f);
+		// auto& camFrustum = decoyCam.GetFrustum();
+		//DebugDraw::AddFrustrum(camFrustum.FTL, camFrustum.FTR, camFrustum.FBL, camFrustum.FBR,
+		//	camFrustum.NTL, camFrustum.NTR, camFrustum.NBL, camFrustum.NBR, {1.0f, 0.2f, 0.2f, 1.0f});
 
 		//
 		std::vector<Rect> quadTreeVis;
@@ -312,7 +312,7 @@ private:
 	SimpleRenderer* renderer;
 	FlyCamera m_camera = FlyCamera(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 	
-	Plane* plane;
+	PlaneMesh* plane;
 	Sphere*	sphere;
 	Sphere*	tSphere;
 	Torus* torus;

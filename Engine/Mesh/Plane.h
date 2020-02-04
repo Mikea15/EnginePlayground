@@ -12,10 +12,10 @@
   with the positive y axis being the normal.
 
 */
-class Plane : public Mesh
+class PlaneMesh : public Mesh
 {
 public:
-    Plane() = default;
-	Plane(unsigned int xSegments, unsigned int ySegments);
+    PlaneMesh() = default;
+	PlaneMesh(unsigned int xSegments, unsigned int ySegments);
 };
 

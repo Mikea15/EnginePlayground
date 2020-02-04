@@ -94,6 +94,17 @@ add_library(
 	SystemComponents/SystemComponentManager.cpp
 	SystemComponents/SystemComponentManager.h
 
+	Systems/AABB.cpp
+	Systems/AABB.h
+	Systems/BoundingFrustum.cpp
+	Systems/BoundingFrustum.h
+	Systems/BoundingSphere.cpp
+	Systems/BoundingSphere.h
+	Systems/GeomDefines.h
+	Systems/Plane.cpp
+	Systems/Plane.h
+	Systems/Octree.cpp
+	Systems/Octree.h
 	Systems/GameFrameTime.cpp
 	Systems/GameFrameTime.h
 	Systems/QuadTree.h
@@ -117,7 +128,7 @@ add_library(
 	Game.cpp
 	Game.h
 	State.h
- "Renderer/DebugDraw.cpp" "Systems/QuadTree.cpp" "Systems/Rect.cpp")
+ "Renderer/DebugDraw.cpp" "Systems/QuadTree.cpp" "Systems/Rect.cpp" "Systems/AABB.cpp" "Systems/BoundingSphere.cpp" "Systems/BoundingFrustum.cpp" "Systems/Plane.cpp" "Systems/Octree.cpp")
 
 # TODO: Add tests and install targets if needed.
 find_package(glm CONFIG REQUIRED)

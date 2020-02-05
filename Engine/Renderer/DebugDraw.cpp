@@ -16,9 +16,8 @@ namespace DebugDraw
 
 	GLint m_viewProjecLoc = -1;
 
-	
-
 	std::vector<Line> m_lines;
+	std::vector<float> m_scratchPadLineData;
 
 	void _print_shader_info_log(unsigned int shader_index) {
 		int max_length = 2048;
@@ -54,7 +53,7 @@ namespace DebugDraw
 		out vec4 FragColor;
 		in vec4 Color;
 		void main () {
-			FragColor = vec4(Color.rgb, 1.0f);
+			FragColor = Color;
 		}
 	)foo";
 
@@ -107,6 +106,8 @@ namespace DebugDraw
 		glUseProgram(m_linesShader);
 		glUniformMatrix4fv(m_viewProjecLoc, 1, GL_FALSE, PV);
 
+		m_scratchPadLineData.reserve(MAX_APG_GL_DB_LINES * 14); // 14 floats per line.
+
 		return true;
 	}
 
@@ -131,7 +132,7 @@ namespace DebugDraw
 	int AddLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& col) {
 		if (m_lines.size() >= MAX_APG_GL_DB_LINES) 
 		{
-			LOG_WARNING("DebugDraw: Can't add more lines to draw");
+			// LOG_WARNING("DebugDraw: Can't add more lines to draw");
 			return -1;
 		}
 
@@ -349,19 +350,32 @@ namespace DebugDraw
 
 	void Draw(bool x_ray) 
 	{
+		m_scratchPadLineData.clear();
+
 		const unsigned int lineCount = m_lines.size();
 		for (int i = 0; i < lineCount; ++i)
 		{
 			auto& l = m_lines[i];
-			float data[] = {
-				l.start.x, l.start.y, l.start.z, l.col.x, l.col.y, l.col.z, l.col.a,
-				l.end.x, l.end.y, l.end.z, l.col.x, l.col.y, l.col.z, l.col.a,
-			};
-			GLintptr offset = sizeof(data) * i;
-			GLsizei stride = sizeof(data);
-			glBindBuffer(GL_ARRAY_BUFFER, m_linesVBO);
-			glBufferSubData(GL_ARRAY_BUFFER, offset, stride, data);
+			m_scratchPadLineData.push_back(l.start.x);
+			m_scratchPadLineData.push_back(l.start.y);
+			m_scratchPadLineData.push_back(l.start.z);
+			m_scratchPadLineData.push_back(l.col.x);
+			m_scratchPadLineData.push_back(l.col.y);
+			m_scratchPadLineData.push_back(l.col.z);
+			m_scratchPadLineData.push_back(l.col.a);
+			m_scratchPadLineData.push_back(l.end.x);
+			m_scratchPadLineData.push_back(l.end.y);
+			m_scratchPadLineData.push_back(l.end.z);
+			m_scratchPadLineData.push_back(l.col.x);
+			m_scratchPadLineData.push_back(l.col.y);
+			m_scratchPadLineData.push_back(l.col.z);
+			m_scratchPadLineData.push_back(l.col.a);
 		}
+
+		GLintptr offset = sizeof(float) * m_scratchPadLineData.size() * 0;
+		GLsizei size = sizeof(float) * m_scratchPadLineData.size();
+		glBindBuffer(GL_ARRAY_BUFFER, m_linesVBO);
+		glBufferSubData(GL_ARRAY_BUFFER, offset, size, &m_scratchPadLineData[0]);
 
 		GLboolean dwe = false;
 		glGetBooleanv(GL_DEPTH_TEST, &dwe);
@@ -372,9 +386,20 @@ namespace DebugDraw
 			glEnable(GL_DEPTH_TEST);
 		}
 
+		GLboolean blendBool = false;
+		glGetBooleanv(GL_BLEND, &blendBool);
+		
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glUseProgram(m_linesShader);
 		glBindVertexArray(m_linesVAO);
 		glDrawArrays(GL_LINES, 0, lineCount * 2);
+
+		if( !blendBool )
+		{
+			glDisable(GL_BLEND);
+		}
 
 		if (dwe && x_ray) {
 			glEnable(GL_DEPTH_TEST);

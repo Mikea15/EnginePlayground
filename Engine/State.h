@@ -289,6 +289,10 @@ public:
 
 		renderer->RenderPushedCommands();
 
+		DebugDraw::AddPosition(glm::vec3(0.0f), 0.5f);
+		DebugDraw::AddLine(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+		DebugDraw::AddLine(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+		DebugDraw::AddLine(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
 		bool x_ray = false;
 		DebugDraw::Draw(x_ray);
 	};
@@ -334,7 +338,7 @@ public:
 private:
 	Game* m_game;
 	SimpleRenderer* renderer;
-	FlyCamera m_camera = FlyCamera(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	FlyCamera m_camera = FlyCamera(glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 	
 	PlaneMesh* plane;
 	Sphere*	sphere;
@@ -364,7 +368,7 @@ private:
 	bool m_drawObjects = false;
 	bool m_drawQuadtree = false;
 	bool m_drawOctree = false;
-	bool m_drawGrid = false;
+	bool m_drawGrid = true;
 
 	QuadTree m_qTree;
 	Octree m_oTree;

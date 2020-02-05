@@ -8,7 +8,7 @@
 
 //
 // memory is reserved to support this many lines at one time
-#define MAX_APG_GL_DB_LINES 1024 * 4
+#define MAX_APG_GL_DB_LINES 1024 * 8
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -34,6 +34,7 @@ namespace DebugDraw
 		glm::vec3 start, end;
 		glm::vec4 col;
 	};
+	
 
 	bool Init();
 	

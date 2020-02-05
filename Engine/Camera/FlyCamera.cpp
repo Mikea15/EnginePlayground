@@ -13,7 +13,7 @@ FlyCamera::FlyCamera(glm::vec3 position, glm::vec3 forward, glm::vec3 up)
 	, m_yaw(0.0f)
 	, m_pitch(0.0f)
 	, m_targetPitch(0.0f)
-	, m_targetYaw(0.0f)
+	, m_targetYaw(-90.0f)
 {
 	m_worldUp = up;
 	m_targetPosition = position;

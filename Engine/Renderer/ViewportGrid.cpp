@@ -7,7 +7,7 @@ ViewportGrid::ViewportGrid(float width, float depth, unsigned int rows, unsigned
 	, m_rows(rows)
 	, m_cols(cols)
 {
-	const glm::vec4 color(0.65f, 0.65f, 0.65f, 1.0f);
+	const glm::vec4 color(0.65f, 0.65f, 0.65f, 0.25f);
 
 	const float halfWidth = m_width * 0.5f;
 	const float halfDepth = m_depth * 0.5f;

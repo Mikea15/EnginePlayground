@@ -23,6 +23,8 @@ union SDL_Event;
 #include "Utils/MathUtils.h"
 #include "Renderer/DebugDraw.h"
 
+#include "Systems/BTree.h"
+#include "Systems/BST.h"
 
 #include <stack>
 
@@ -373,4 +375,7 @@ private:
 	QuadTree m_qTree;
 	Octree m_oTree;
 	ViewportGrid m_viewGrid;
+
+	// BTree<int> btree;
+	
 };

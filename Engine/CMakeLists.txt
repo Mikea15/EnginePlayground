@@ -102,6 +102,10 @@ add_library(
 	Systems/BoundingFrustum.h
 	Systems/BoundingSphere.cpp
 	Systems/BoundingSphere.h
+	Systems/BST.cpp
+	Systems/BST.h
+	Systems/BTree.cpp
+	Systems/BTree.h
 	Systems/GeomDefines.h
 	Systems/Plane.cpp
 	Systems/Plane.h
@@ -130,8 +134,7 @@ add_library(
 	Game.cpp
 	Game.h
 	State.h
- 
- )
+  )
 
 # TODO: Add tests and install targets if needed.
 find_package(glm CONFIG REQUIRED)

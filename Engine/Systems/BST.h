@@ -28,9 +28,6 @@ namespace container
         typedef const T*    const_pointer;
         typedef T&          reference;
         typedef const T&    const_reference;
-        typedef T*          iterator;
-        typedef const T*    const_iterator;
-
 
         BST(T rootItem);
         ~BST();

@@ -21,11 +21,16 @@ namespace MathUtils
 
 	static float Rand01()
 	{
-		return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		return static_cast<float>(rand()) / static_cast <float> (RAND_MAX);
 	}
 
 	static float Rand(float min, float max)
 	{
-		return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+		return min + static_cast<float>(rand()) / (static_cast <float> (RAND_MAX / (max - min)));
+	}
+
+	static float Rand(int min, int max)
+	{
+		return min + static_cast<int>(rand()) / (static_cast <float> (RAND_MAX / (max - min)));
 	}
 }

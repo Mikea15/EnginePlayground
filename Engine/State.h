@@ -25,6 +25,7 @@ union SDL_Event;
 
 #include "Systems/BTree.h"
 #include "Systems/BST.h"
+#include "Systems/BVH.h"
 
 #include <stack>
 
@@ -116,12 +117,12 @@ public:
 		m_qTree = QuadTree(glm::vec3(0.0f), 50.0f);
 		m_oTree = Octree(glm::vec3(0.0f), 50.0f);
 
-		const float spacing = 5.2f;
+		const float spacing = 7.2f;
 		for (int x = 0; x < 10; ++x)
 		{
-			for (int z = 0; z < 4; ++z)
+			for (int z = 0; z < 10; ++z)
 			{
-				for (int y = 0; y < 4; ++y)
+				for (int y = 0; y < 10; ++y)
 				{
 					glm::vec3 position = glm::vec3(0.0f, 0.5f, 0.0f) + glm::vec3(x - 5, y, z - 5) * spacing;
 
@@ -142,6 +143,8 @@ public:
 
 					m_qTree.Insert(position);
 					m_oTree.Insert(position);
+
+					m_bvhTree.InsertNode(x * z * y, AABB(min, max));
 				}
 			}
 		}
@@ -259,6 +262,18 @@ public:
 			}
 		}
 
+		if (m_drawBVH)
+		{
+			// draw octree
+			auto nodes = m_bvhTree.GetNodes();
+			const unsigned int oSize = static_cast<unsigned int>(nodes.size());
+			for (unsigned int i = 0; i < oSize; ++i)
+			{
+				auto box = nodes[i]->box;
+				DebugDraw::AddAABB(box.GetMin(), box.GetMax());
+			}
+		}
+
 		// draw grid
 		if (m_drawGrid) 
 		{
@@ -323,6 +338,7 @@ public:
 				ImGui::Checkbox("Draw Objects", &m_drawObjects);
 				ImGui::Checkbox("Draw Quadtree", &m_drawQuadtree);
 				ImGui::Checkbox("Draw Octree", &m_drawOctree);
+				ImGui::Checkbox("Draw BVH", &m_drawBVH);
 				ImGui::Checkbox("Draw Grid", &m_drawGrid);
 				ImGui::EndMenu();
 			}
@@ -370,12 +386,14 @@ private:
 	bool m_drawObjects = false;
 	bool m_drawQuadtree = false;
 	bool m_drawOctree = false;
+	bool m_drawBVH = false;
 	bool m_drawGrid = true;
 
 	QuadTree m_qTree;
 	Octree m_oTree;
 	ViewportGrid m_viewGrid;
 
+	bvh::Tree m_bvhTree;
 	// BTree<int> btree;
 	
 };

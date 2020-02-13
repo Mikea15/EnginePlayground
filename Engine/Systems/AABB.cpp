@@ -23,8 +23,20 @@ AABB::AABB(const glm::vec3& origin, float halfSize)
 }
 
 AABB::AABB(const glm::vec3& min, const glm::vec3& max)
-	: AABB((min + max) * 0.5f, min, max)
 {
+	m_origin = min + (max - min) * 0.5f;
+
+	m_points.resize(8);
+	m_points[0] = m_min = min;
+	m_points[3] = glm::vec3(min.x, min.y, max.z);
+	m_points[1] = glm::vec3(min.x, max.y, min.z);
+	m_points[2] = glm::vec3(min.x, max.y, max.z);
+	m_points[5] = glm::vec3(max.x, min.y, min.z);
+	m_points[6] = glm::vec3(max.x, min.y, max.z);
+	m_points[4] = glm::vec3(max.x, max.y, min.z);
+	m_points[7] = m_max = max;
+
+	m_halfSize = GetWidth() * 0.5f;
 }
 
 AABB::AABB(const glm::vec3& origin, const glm::vec3& min, const glm::vec3& max)
@@ -39,7 +51,7 @@ AABB::AABB(const glm::vec3& origin, const glm::vec3& min, const glm::vec3& max)
 	m_points[4] = m_origin + glm::vec3(max.x, max.y, min.z);
 	m_points[7] = m_max = origin + max;
 
-	m_halfSize = GetExtent() * 0.5f;
+	m_halfSize = GetWidth() * 0.5f;
 }
 
 AABB::~AABB()
@@ -58,7 +70,7 @@ void AABB::SetBounds(glm::vec3 min, glm::vec3 max)
 	m_points[4] = m_origin + glm::vec3(max.x, max.y, min.z);
 	m_points[7] = m_max = m_origin + max;
 
-	m_halfSize = GetExtent() * 0.5f;
+	m_halfSize = GetWidth() * 0.5f;
 }
 
 ContainmentType AABB::Contains(const AABB& box) const
@@ -271,5 +283,26 @@ PlaneIntersectionType AABB::Intersects(const Plane& plane) const
 	}
 
 	return PlaneIntersectionType::Intersecting;
+}
+
+const float AABB::Area() const
+{
+	glm::vec3 d = m_max - m_min;
+	return 2.0f * (d.x * d.y + d.y * d.z + d.z * d.x);
+}
+
+AABB AABB::Union(const AABB& a, const AABB& b)
+{	
+#if 0
+	return AABB(
+		Min2(a.GetMin(), b.GetMin()),
+		Max2(a.GetMax(), b.GetMax())
+	);
+#else
+	return AABB(
+		glm::min(a.GetMin(), b.GetMin()),
+		glm::max(a.GetMax(), b.GetMax())
+	);
+#endif
 }
 

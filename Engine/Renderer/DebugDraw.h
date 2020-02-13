@@ -8,7 +8,11 @@
 
 //
 // memory is reserved to support this many lines at one time
-#define MAX_APG_GL_DB_LINES 1024 * 8
+// 1 point - 3vert, 4col
+// 1 line - 2 points
+// 56 bytes = 7 * 4 * 2
+// 20000 lines = 20000 * 56 -> 1120000 bytes -> 1.06 Mb
+#define MAX_APG_GL_DB_LINES 20000
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846

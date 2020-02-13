@@ -18,7 +18,7 @@ LineStrip::LineStrip(float width, unsigned int segments)
 		UV.push_back({ (float)i * deltaX, 0.0f });
 	}
 
-	Topology = TRIANGLE_STRIP;
+	Topology = TOPOLOGY::TRIANGLE_STRIP;
 
 	Finalize();
 }

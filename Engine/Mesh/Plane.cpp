@@ -38,6 +38,6 @@ PlaneMesh::PlaneMesh(unsigned int xSegments, unsigned int ySegments)
 		oddRow = !oddRow;
 	}
 
-	Topology = TRIANGLE_STRIP;
+	Topology = TOPOLOGY::TRIANGLE_STRIP;
 	Finalize();
 }

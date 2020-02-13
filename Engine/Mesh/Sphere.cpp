@@ -38,7 +38,7 @@ Sphere::Sphere(unsigned int xSegments, unsigned int ySegments)
 		}
 	}
 
-	Topology = TRIANGLES;
+	Topology = TOPOLOGY::TRIANGLES;
 	Finalize();
 }
 

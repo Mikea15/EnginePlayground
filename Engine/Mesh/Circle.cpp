@@ -39,6 +39,6 @@ Circle::Circle(unsigned int edgeSegments, unsigned int ringSegments)
 		oddRow = !oddRow;
 	}
 
-	Topology = TRIANGLE_STRIP;
+	Topology = TOPOLOGY::TRIANGLE_STRIP;
 	Finalize();
 }

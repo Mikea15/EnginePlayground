@@ -21,7 +21,7 @@ static const double TAU = 2.0 * PI;
   get rid of in a cross renderer way soon enough.
 
 */
-enum TOPOLOGY
+enum class TOPOLOGY
 {
 	POINTS,
 	LINES,
@@ -51,7 +51,7 @@ public:
 	std::vector<glm::vec3> Tangents;
 	std::vector<glm::vec3> Bitangents;
 
-	TOPOLOGY Topology = TRIANGLES;
+	TOPOLOGY Topology = TOPOLOGY::TRIANGLES;
 	std::vector<unsigned int> Indices;
 
 	// support multiple ways of initializing a mesh

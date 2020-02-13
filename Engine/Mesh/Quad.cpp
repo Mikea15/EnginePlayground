@@ -17,7 +17,7 @@ Quad::Quad()
 		{ 1.0f, 1.0f, },
 		{ 1.0f, 0.0f, },
 	};
-	Topology = TRIANGLE_STRIP;
+	Topology = TOPOLOGY::TRIANGLE_STRIP;
 
 	Finalize();
 }
@@ -37,7 +37,7 @@ Quad::Quad(float width, float height)
 		{ 1.0f, 1.0f, },
 		{ 1.0f, 0.0f, },
 	};
-	Topology = TRIANGLE_STRIP;
+	Topology = TOPOLOGY::TRIANGLE_STRIP;
 
 	Finalize();
 }

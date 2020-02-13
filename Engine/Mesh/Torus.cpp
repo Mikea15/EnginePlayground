@@ -86,6 +86,6 @@ Torus::Torus(float r1, float r2, unsigned int numSteps1, unsigned int numSteps2)
 		}
 	}
 
-	Topology = TRIANGLES;
+	Topology = TOPOLOGY::TRIANGLES;
 	Finalize();
 }

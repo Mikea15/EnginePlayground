@@ -158,7 +158,7 @@ Mesh* MeshLoader::parseMesh(aiMesh* aMesh, const aiScene* aScene, glm::vec3& out
 	mesh->Tangents = tangents;
 	mesh->Bitangents = bitangents;
 	mesh->Indices = indices;
-	mesh->Topology = TRIANGLES;
+	mesh->Topology = TOPOLOGY::TRIANGLES;
 	mesh->Finalize(true);
 
 	out_Min.x = pMin.x;

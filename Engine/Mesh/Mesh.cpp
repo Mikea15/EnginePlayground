@@ -672,7 +672,7 @@ void Mesh::FromSDF(std::function<float(glm::vec3)>& sdf, float maxDistance, uint
 		}
 	}
 
-	Topology = TRIANGLES;
+	Topology = TOPOLOGY::TRIANGLES;
 	Finalize();
 
 	LOG("SDF mesh generation complete!");

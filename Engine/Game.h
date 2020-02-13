@@ -10,7 +10,7 @@
 #include "Window/SDLHandler.h"
 
 class State;
-struct WindowParams;
+class WindowParams;
 
 class Game
 {

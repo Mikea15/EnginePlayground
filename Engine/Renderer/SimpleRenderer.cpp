@@ -514,7 +514,7 @@ void SimpleRenderer::RenderMesh(Mesh* mesh)
 	// Render Mesh
 	glBindVertexArray(mesh->m_VAO);
 
-	const GLenum mode = mesh->Topology == TRIANGLE_STRIP ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
+	const GLenum mode = mesh->Topology == TOPOLOGY::TRIANGLE_STRIP ? GL_TRIANGLE_STRIP : GL_TRIANGLES;
 	if (!mesh->Indices.empty())
 	{
 		glDrawElements(mode, mesh->Indices.size(), GL_UNSIGNED_INT, 0);

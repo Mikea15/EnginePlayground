@@ -4,11 +4,6 @@
 #include "State.h"
 
 #include "Game.h"
-#include "Window/WindowParams.h"
-#include "Window/SDLHandler.h"
-#include "Renderer/Renderer.h"
-
-
 
 class StubState1
 	: public State
